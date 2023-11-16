@@ -1,5 +1,5 @@
 
-# Voting Device for the International Sensor Development Project
+# International Sensor Development Project: Voting Device
 ## Ver 1.0
 
 ## Table of Contents
