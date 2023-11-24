@@ -25,6 +25,10 @@ void setup() {
   pinMode(BUTTON_PIN_2, INPUT_PULLUP);  // Taster 2 als Eingang mit Pull-up-Widerstand
   pinMode(BUTTON_PIN_3, INPUT_PULLUP);  // Taster 3 als Eingang mit Pull-up-Widerstand
 
+#ifdef ISRS_FOR_BUTTONS
+  attachISR();
+#endif
+
 #ifdef STATUS_LEDS
   pinMode(LED_PIN_1, OUTPUT);  // LED 1 als Ausgang
   pinMode(LED_PIN_2, OUTPUT);  // LED 2 als Ausgang
