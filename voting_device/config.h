@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>  // default wifi library
 #include <PubSubClient.h> //Mqtt library by Nick O'Leary
+//#include <Wifi.h>
 
 
 //Definition of GPIOS for Buttons
@@ -18,7 +19,9 @@ const char* mqtt_server = "10.42.0.1";
 const int mqtt_port = 1883;
 const char* mqtt_user = "";
 const char* mqtt_password = "";
-
+// Mqtt topics to subscribe
+String topicInit = "/registration/esp/" + WiFi.macAddress();
+// Mqtt topics to publish
 
 //configuration of functionality
 //#define ENCRYPTION
