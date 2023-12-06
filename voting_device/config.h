@@ -20,7 +20,17 @@ const char* mqtt_server = "10.42.0.1";
 const int mqtt_port = 1883;
 const char* mqtt_user = "";
 const char* mqtt_password = "";
+#define MQTTpubQos 1                  
+#define MQTTsubQos 1
 
+// MQTT topics to subscribe
+
+const char* subInit = ("/registration/esp/"+WiFi.macAddress()).c_str();
+const char* subVoteSetup = "/setupVote/Setup";
+const char* subResync = "/setupVote/Resync";
+//Mqtt topics to publish
+const char* pubInit = ("/registration/Server/"+WiFi.macAddress()).c_str();
+const char* pubPubVote = "/vote/VotingID";
 
 //configuration of functionality
 //#define ENCRYPTION
