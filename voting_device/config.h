@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>  // default wifi library
 #include <PubSubClient.h> //Mqtt library by Nick O'Leary
+//#include <Wifi.h>
 
 
 //Definition of GPIOS for Buttons
@@ -31,6 +32,7 @@ const char* subResync = "/setupVote/Resync";
 //Mqtt topics to publish
 const char* pubInit = ("/registration/Server/"+WiFi.macAddress()).c_str();
 const char* pubPubVote = "/vote/VotingID";
+
 
 //configuration of functionality
 //#define ENCRYPTION
