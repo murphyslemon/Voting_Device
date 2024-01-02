@@ -25,6 +25,10 @@ void setup() {
   pinMode(BUTTON_PIN_2, INPUT_PULLUP);  // Taster 2 als Eingang mit Pull-up-Widerstand
   pinMode(BUTTON_PIN_3, INPUT_PULLUP);  // Taster 3 als Eingang mit Pull-up-Widerstand
 
+#ifdef ISRS_FOR_BUTTONS
+  attachISR();
+#endif
+
 #ifdef STATUS_LEDS
   pinMode(LED_PIN_1, OUTPUT);  // LED 1 als Ausgang
   pinMode(LED_PIN_2, OUTPUT);  // LED 2 als Ausgang
@@ -55,7 +59,9 @@ void setup() {
   // Verbindung zum MQTT-Server herstellen
   mqttClient.setServer(mqtt_server, mqtt_port);
   mqttClient.setCallback(callback);
-  mqttClient.subscribe("#");
+  mqttClient.subscribe(subInit, MQTTsubQos);
+  mqttClient.subscribe(subResync, MQTTsubQos);
+  mqttClient.subscribe(subVoteSetup, MQTTsubQos);
 
   while (!mqttClient.connected()) {
 #ifdef DEBUG
@@ -73,7 +79,7 @@ void loop() {
   if (digitalRead(BUTTON_PIN_1) == LOW) {
     digitalWrite(LED_PIN_1, HIGH);  // Wenn Taster 1 gedrückt wird, schalte LED 1 ein
     if (message_count == 0) {
-      mqttClient.publish("send", "Taster 1!");
+      mqttClient.publish(pubInit, (const uint8_t*)"{'VotingID':'Unique voting id'}", MQTTpubQos, false);
       message_count++;
     }
   } else {
