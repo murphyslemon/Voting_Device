@@ -58,77 +58,79 @@ void drawImage(int x, int y, int width, int height, const unsigned char *image) 
 }
 
 bool question_mark(const char *question) {
-  int question_len = strlen(question);
-  if (question_len > 0 && question[question_len - 1] == '?') {
+    int question_len = strlen(question);
+    if (question_len > 0 && question[question_len - 1] == '?') {
+        return true;
+    }
+    return false;
+}
+
+bool check_question(const char *question, char *line, int *position) {
+    if (!question_mark(question)) {
+        printf("ERROR: No question mark!");
+        return false;
+    }
+    int count = 0;
+    do {
+        strncpy(line, question + *position, 15);
+        line[15] = '\0';
+
+        int pos = 15;
+        int extra = 0;
+        while (pos >= 0 && line[pos] != ' ') {
+            pos--;
+            extra++;
+        }
+        line[pos] = '\0';
+
+        if (extra == 16) {
+            line[14] = '-';
+            *position -= 1;  // Update position to after the '-'
+        } else {
+            *position -= extra;  // Update position to the last space
+            *position += 1;  // Update position to after the space
+        }
+        printf("%s\n", line);
+        *position += 15;
+        count++;
+    } while (!question_mark(line) && count < 6);
+
+    if (count == 6) {
+        printf("ERROR: Question too long!");
+        return false;
+    }
     return true;
-  }
-  return false;
 }
 
-void process_string(const char *question, char *string, int *position) {
-  strncpy(string, question + *position, 15);
-  string[15] = '\0';
-  int string_len = 15;
-  while (string[string_len] != ' ') {
-    string_len--;
-  }
-  int remainder = *position - string_len - 1;
-  *position -= remainder;
-  if (string_len > 0) {
-    string[string_len] = '\0';  // Null-terminate at the space
-  }
-}
+void display_question(const char *question, char *line, int *position) {
+    paint.SetWidth(200);
+    paint.SetHeight(16);
+    int count = 0;
+    do {
+        strncpy(line, question + *position, 15);
+        line[15] = '\0';
 
-void display_question(const char *question) {
-  char string[16];
-  if (!question_mark(question)) {
-    printf("ERROR: no question mark!");
-    return;
-  }
+        int pos = 15;
+        int extra = 0;
+        while (pos >= 0 && line[pos] != ' ') {
+            pos--;
+            extra++;
+        }
+        line[pos] = '\0';
 
-  paint.SetWidth(200);
-  paint.SetHeight(16);
-
-  int position = 0;
-  int count = 0;
-  char buffer[20];
-  process_string(question, string, &position);
-  sprintf(buffer, "%d", position);
-  paint.Clear(UNCOLORED); //paints the height and width the given colour
-  paint.DrawStringAt(15, 2, string, &Font16, COLORED); //moves text to co-ordinates with-in the set height and width
-  epd.SetFrameMemory(paint.GetImage(), 0, (100-(count*16)), paint.GetWidth(), paint.GetHeight()); //moves page to co-ordinate
-  
-  count = 1;
-  process_string(question, string, &position);
-  sprintf(buffer, "%d", position);
-  paint.Clear(UNCOLORED); //paints the height and width the given colour
-  paint.DrawStringAt(15, 2, string, &Font16, COLORED); //moves text to co-ordinates with-in the set height and width
-  epd.SetFrameMemory(paint.GetImage(), 0, (100-(count*16)), paint.GetWidth(), paint.GetHeight()); //moves page to co-ordinate
-   
-  count = 2;
-  process_string(question, string, &position);
-  paint.Clear(UNCOLORED); //paints the height and width the given colour
-  sprintf(buffer, "%d", position);
-  paint.DrawStringAt(15, 2, string, &Font16, COLORED); //moves text to co-ordinates with-in the set height and width
-  epd.SetFrameMemory(paint.GetImage(), 0, (100-(count*16)), paint.GetWidth(), paint.GetHeight()); //moves page to co-ordinate
-
-  count = 3;
-  process_string(question, string, &position);
-  paint.Clear(UNCOLORED); //paints the height and width the given colour
-  sprintf(buffer, "%d", position);
-  paint.DrawStringAt(15, 2, string, &Font16, COLORED); //moves text to co-ordinates with-in the set height and width
-  epd.SetFrameMemory(paint.GetImage(), 0, (100-(count*16)), paint.GetWidth(), paint.GetHeight()); //moves page to co-ordinate
-
-  /*
-  do {
-    process_string(question, string, &position);
-    paint.Clear(UNCOLORED); //paints the height and width the given colour
-    paint.DrawStringAt(15, 2, string, &Font16, COLORED); //moves text to co-ordinates with-in the set height and width
-    epd.SetFrameMemory(paint.GetImage(), 0, (100-(count*16)), paint.GetWidth(), paint.GetHeight()); //moves page to co-ordinate
-    count++;
-  } while (strchr(string, '?') == NULL);
-  */
-  
+        if (extra == 16) {
+            line[14] = '-';
+            *position -= 1;  // Update position to after the '-'
+        } else {
+            *position -= extra;  // Update position to the last space
+            *position += 1;  // Update position to after the space
+        }
+        paint.Clear(UNCOLORED); //paints the height and width the given colour
+        paint.DrawStringAt(15, 2, line, &Font16, COLORED); //moves text to co-ordinates with-in the set height and width
+        epd.SetFrameMemory(paint.GetImage(), 0, (120-(count*16)), paint.GetWidth(), paint.GetHeight()); //moves page to co-ordinate
+        *position += 15;
+        count++;
+    } while (!question_mark(line));
 }
 
 void setup() {
@@ -179,23 +181,15 @@ void setup() {
     //vote question
     char question[100] = "How many characters can E-paper fit across?";
 
-    display_question(question);
+    char question2[100] = "Pneumonoultramicroscopicsilicovolcanoconiosis is a long question?";
+    int position = 0;
+    char line[16];
 
-    //paint.SetWidth(200);
-    //paint.SetHeight(16);
-    //paint.Clear(UNCOLORED); //paints the height and width the given colour
-    //paint.DrawStringAt(15, 2, "How many", &Font16, COLORED); //moves text to co-ordinates with-in the set height and width
-    //epd.SetFrameMemory(paint.GetImage(), 0, 100, paint.GetWidth(), paint.GetHeight()); //moves page to co-ordinates
-    //paint.Clear(UNCOLORED);
-    //paint.DrawStringAt(15, 2, "characters can", &Font16, COLORED);
-    //epd.SetFrameMemory(paint.GetImage(), 0, (100-16), paint.GetWidth(), paint.GetHeight());
-    //paint.Clear(UNCOLORED);
-    //paint.DrawStringAt(15, 2, "Epaper fit", &Font16, COLORED);
-    //epd.SetFrameMemory(paint.GetImage(), 0, (100-16-16), paint.GetWidth(), paint.GetHeight());
-    //paint.Clear(UNCOLORED);
-    //paint.DrawStringAt(15, 2, "across?", &Font16, COLORED);
-    //epd.SetFrameMemory(paint.GetImage(), 0, (100-16-16-16), paint.GetWidth(), paint.GetHeight());
-
+    bool all_good = check_question(question2, line, &position);
+    if (all_good) {
+        position = 0;
+        display_question(question2, line, &position);
+    }
     epd.DisplayFrame();
 }
 
