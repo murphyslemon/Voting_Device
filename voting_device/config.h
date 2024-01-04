@@ -9,12 +9,21 @@
 #define BUTTON_PIN_2 4   // GPIO 4 (entspricht D2) für Taster 2
 #define BUTTON_PIN_3 16  // GPIO 16 (entspricht D0) für Taster 3
 
+#define YES     0
+#define ABSTAIN 1
+#define NO      2
+
+#define BOOT        0
+#define VOTE        1
+#define CONFIRM     2
+#define CLOSE_VOTE  3
+
 
 
 
 // WLAN-Settings
-const char* ssid = "RasPi-Netzwerk";
-const char* password = "";
+const char* ssid = "franks_galaxy";
+const char* password = "veef2267";
 
 // MQTT-Server Settings
 const char* mqtt_server = "10.42.0.1";

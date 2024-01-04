@@ -93,9 +93,9 @@ bool check_question(const char *question, char *line, int *position) {
         printf("%s\n", line);
         *position += 15;
         count++;
-    } while (!question_mark(line) && count < 6);
+    } while (!question_mark(line));
 
-    if (count == 6) {
+    if (count > 6) {
         printf("ERROR: Question too long!");
         return false;
     }
@@ -181,7 +181,7 @@ void setup() {
     //vote question
     char question[100] = "How many characters can E-paper fit across?";
 
-    char question2[100] = "Pneumonoultramicroscopicsilicovolcanoconiosis is a long question?";
+    char question2[100] = "Pneumonoultramicroscopicsilicovolcanoconiosis is a long question another another?";
     int position = 0;
     char line[16];
 
