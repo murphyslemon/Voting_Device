@@ -19,11 +19,28 @@ void callback(char* topic, byte* payload, unsigned int length) {
   // Nachricht weiterleiten
   //mqttClient.publish("e", payload, length);
 }
+int checkBatteryLevel(){
+  int adcValue = analogRead(BATTERY_PIN);
+  float voltage = adcValue * REFERENCE_VOLTAGE / 1023
+  //int batteryLevel = map(constrain(voltage, 3.0, 9.0), 3.0, 9.0, 0, 100);
+  int batteryLevel = map(voltage, 3.0, 9.0, 0, 100);
+  return batteryLevel;
+}
 
 void setup() {
+  /*
   pinMode(BUTTON_PIN_1, INPUT_PULLUP);  // Taster 1 als Eingang mit Pull-up-Widerstand
   pinMode(BUTTON_PIN_2, INPUT_PULLUP);  // Taster 2 als Eingang mit Pull-up-Widerstand
   pinMode(BUTTON_PIN_3, INPUT_PULLUP);  // Taster 3 als Eingang mit Pull-up-Widerstand
+  */
+  pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(BUTTON_PIN_1, OUTPUT);
+  digitalWrite(BUTTON_PIN_1, HIGH);
+  digitalWrite(LED_BUILTIN, HIGH);
+  pinMode(RXPIN, INPUT_PULLUP);
+#ifdef ISRS_FOR_BUTTONS
+  attachISR();
+#endif
 
 #ifdef STATUS_LEDS
   pinMode(LED_PIN_1, OUTPUT);  // LED 1 als Ausgang
@@ -55,7 +72,9 @@ void setup() {
   // Verbindung zum MQTT-Server herstellen
   mqttClient.setServer(mqtt_server, mqtt_port);
   mqttClient.setCallback(callback);
-  mqttClient.subscribe("#");
+  mqttClient.subscribe(subInit, MQTTsubQos);
+  mqttClient.subscribe(subResync, MQTTsubQos);
+  mqttClient.subscribe(subVoteSetup, MQTTsubQos);
 
   while (!mqttClient.connected()) {
 #ifdef DEBUG
@@ -69,33 +88,57 @@ void setup() {
 #endif
 }
 
-void loop() {
-  if (digitalRead(BUTTON_PIN_1) == LOW) {
-    digitalWrite(LED_PIN_1, HIGH);  // Wenn Taster 1 gedrückt wird, schalte LED 1 ein
-    if (message_count == 0) {
-      mqttClient.publish("send", "Taster 1!");
-      message_count++;
-    }
-  } else {
-    message_count = 0;
-    digitalWrite(LED_PIN_1, LOW);  // Andernfalls schalte LED 1 aus
-  }
+int state = 0;
+int response;
 
-  if (digitalRead(BUTTON_PIN_2) == LOW) {
-    digitalWrite(LED_PIN_2, HIGH);  // Wenn Taster 2 gedrückt wird, schalte LED 2 ein
-  } else {
-    digitalWrite(LED_PIN_2, LOW);  // Andernfalls schalte LED 2 aus
-  }
+bool username = true; // move to right location
+bool question = true; //move to right location
 
-  if (digitalRead(BUTTON_PIN_3) == LOW) {
-    digitalWrite(LED_PIN_3, HIGH);  // Wenn Taster 3 gedrückt wird, schalte LED 3 ein
-  } else {
-    digitalWrite(LED_PIN_3, LOW);  // Andernfalls schalte LED 3 aus
-  }
-  // MQTT-Nachrichten abrufen
-  if (!mqttClient.loop()) {
-#ifdef DEBUG
-    Serial.println("Verbindung zum MQTT-Server abgebrochen");
-#endif
-  }
+void loop() {/* working progress, need to define pressed function and buttons
+  switch (state) {
+    case BOOT:
+      //display start up screen
+      //check connection
+      if (WiFi.status() != WL_CONNECTED) {
+        //error msg
+        //try connect again
+      } 
+      //receive user name and vote question
+      if (!username) {
+        //error msg
+        //request user name
+      }
+      if (!question) {
+        //error msg
+        //request question
+      }
+      //battery status
+      state = 1;
+    case VOTE:
+      //display question
+      if (button_A) {
+        response = YES
+        state = 2;
+      }
+      else if (button_B) {
+        response = ABSTAIN
+        state = 2;
+      }
+      else if (button_C) {
+        response = NO
+        state = 2;
+      }
+    case CONFIRM:
+      if (button_A) {
+        response = YES
+        state = 3;
+      }
+      else if (button_C){
+        response = NO
+        state = 1;
+      }
+    case CLOSE_VOTE:
+      //display closing thank you
+      delay(5000);
+  }*/
 }

@@ -1,34 +1,57 @@
-
 #include <Arduino.h>
 #include <ESP8266WiFi.h>  // default wifi library
 #include <PubSubClient.h> //Mqtt library by Nick O'Leary
 //#include <Wifi.h>
 
+#define BATTERY_PIN A0
+#define REFERENCE_VOLTAGE 3.3
 
 //Definition of GPIOS for Buttons
 #define BUTTON_PIN_1 5   // GPIO 5 (entspricht D1) für Taster 1
 #define BUTTON_PIN_2 4   // GPIO 4 (entspricht D2) für Taster 2
 #define BUTTON_PIN_3 16  // GPIO 16 (entspricht D0) für Taster 3
+#define RXPIN        3
+
+#define YES     0
+#define ABSTAIN 1
+#define NO      2
+
+#define BOOT        0
+#define VOTE        1
+#define CONFIRM     2
+#define CLOSE_VOTE  3
+
+
+
 
 // WLAN-Settings
-const char* ssid = "RasPi-Netzwerk";
-const char* password = "";
+const char* ssid = "franks_galaxy";
+const char* password = "veef2267";
 
 // MQTT-Server Settings
 const char* mqtt_server = "10.42.0.1";
 const int mqtt_port = 1883;
 const char* mqtt_user = "";
 const char* mqtt_password = "";
-// Mqtt topics to subscribe
-String topicInit = "/registration/esp/" + WiFi.macAddress();
-// Mqtt topics to publish
+#define MQTTpubQos 1                  
+#define MQTTsubQos 1
+
+// MQTT topics to subscribe
+
+const char* subInit = ("/registration/esp/"+WiFi.macAddress()).c_str();
+const char* subVoteSetup = "/setupVote/Setup";
+const char* subResync = "/setupVote/Resync";
+//Mqtt topics to publish
+const char* pubInit = ("/registration/Server/"+WiFi.macAddress()).c_str();
+const char* pubPubVote = "/vote/VotingID";
+
 
 //configuration of functionality
 //#define ENCRYPTION
 #define STATUS_LEDS
 //#define E_PAPER
 #define DEBUG
-
+#define ISRS_FOR_BUTTONS
 
 //Includes according to config
 
@@ -44,4 +67,14 @@ String topicInit = "/registration/esp/" + WiFi.macAddress();
 
 #ifdef E_PAPER
 #include <E_Paper_Library.h> //todo find epaper library
+#endif
+
+#ifdef ISRS_FOR_BUTTONS
+#include "button_interrupts.h"
+void attachISR(void){
+  //attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_1), Isr_Btn_1, FALLING);
+  //attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_2), Isr_Btn_2, FALLING);
+  //attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_3), Isr_Btn_3, FALLING);
+  attachInterrupt(digitalPinToInterrupt(RXPIN), powerButtonInterrupt, FALLING);
+}
 #endif
