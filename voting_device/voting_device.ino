@@ -21,10 +21,16 @@ void callback(char* topic, byte* payload, unsigned int length) {
 }
 
 void setup() {
+  /*
   pinMode(BUTTON_PIN_1, INPUT_PULLUP);  // Taster 1 als Eingang mit Pull-up-Widerstand
   pinMode(BUTTON_PIN_2, INPUT_PULLUP);  // Taster 2 als Eingang mit Pull-up-Widerstand
   pinMode(BUTTON_PIN_3, INPUT_PULLUP);  // Taster 3 als Eingang mit Pull-up-Widerstand
-
+  */
+  pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(powerBtn, OUTPUT);
+  digitalWrite(powerBtn, HIGH);
+  digitalWrite(LED_BUILTIN, HIGH);
+  pinMode(RXPIN, INPUT_PULLUP);
 #ifdef ISRS_FOR_BUTTONS
   attachISR();
 #endif
