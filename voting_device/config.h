@@ -1,9 +1,10 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>  // default wifi library
 #include <PubSubClient.h> //Mqtt library by Nick O'Leary
-#include "button_interrupt.h"
 //#include <Wifi.h>
 
+#define BATTERY_PIN A0
+#define REFERENCE_VOLTAGE 3.3
 
 //Definition of GPIOS for Buttons
 #define BUTTON_PIN_1 5   // GPIO 5 (entspricht D1) für Taster 1
@@ -71,9 +72,9 @@ const char* pubPubVote = "/vote/VotingID";
 #ifdef ISRS_FOR_BUTTONS
 #include "button_interrupts.h"
 void attachISR(void){
-attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_1), Isr_Btn_1, FALLING);
-attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_2), Isr_Btn_2, FALLING);
-attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_3), Isr_Btn_3, FALLING);
-attachInterrupt(digitalPinToInterrupt(RXPIN), powerButtonInterrupt, FALLING);
+  //attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_1), Isr_Btn_1, FALLING);
+  //attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_2), Isr_Btn_2, FALLING);
+  //attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_3), Isr_Btn_3, FALLING);
+  attachInterrupt(digitalPinToInterrupt(RXPIN), powerButtonInterrupt, FALLING);
 }
 #endif

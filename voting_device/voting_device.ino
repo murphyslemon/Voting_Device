@@ -19,6 +19,13 @@ void callback(char* topic, byte* payload, unsigned int length) {
   // Nachricht weiterleiten
   //mqttClient.publish("e", payload, length);
 }
+int checkBatteryLevel(){
+  int adcValue = analogRead(BATTERY_PIN);
+  float voltage = adcValue * REFERENCE_VOLTAGE / 1023
+  //int batteryLevel = map(constrain(voltage, 3.0, 9.0), 3.0, 9.0, 0, 100);
+  int batteryLevel = map(voltage, 3.0, 9.0, 0, 100);
+  return batteryLevel;
+}
 
 void setup() {
   /*
@@ -27,8 +34,8 @@ void setup() {
   pinMode(BUTTON_PIN_3, INPUT_PULLUP);  // Taster 3 als Eingang mit Pull-up-Widerstand
   */
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(powerBtn, OUTPUT);
-  digitalWrite(powerBtn, HIGH);
+  pinMode(BUTTON_PIN_1, OUTPUT);
+  digitalWrite(BUTTON_PIN_1, HIGH);
   digitalWrite(LED_BUILTIN, HIGH);
   pinMode(RXPIN, INPUT_PULLUP);
 #ifdef ISRS_FOR_BUTTONS

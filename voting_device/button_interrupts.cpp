@@ -1,4 +1,5 @@
 #include "button_interrupts.h"
+#include "config.h"
 
 
 uint32_t startTime;
@@ -20,11 +21,12 @@ ICACHE_RAM_ATTR void powerButtonInterrupt(void){
       powerSW = true;
     }
     if (millis() - startTime > 3000) {
-      digitalWrite(BUTTON_PIN_1, LOW);  // Turn device off
+      digitalWrite(BUTTON_PIN_1, LOW);  
       digitalWrite(LED_BUILTIN, LOW);
-      while (!digitalRead(RXPIN));  // Wait for button released
+      while (!digitalRead(RXPIN)); 
     }
   } else {
     powerSW = false;
   }
+
 }
