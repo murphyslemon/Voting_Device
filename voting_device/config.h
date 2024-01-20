@@ -12,6 +12,11 @@
 #define BUTTON_PIN_3 16  // GPIO 16 (entspricht D0) für Taster 3
 #define RXPIN        3
 
+#include "Button_Class.h"
+ButtonVote ButtonYes;
+ButtonVote ButtonNo;
+ButtonVote ButtonAbstain;
+
 #define YES     0
 #define ABSTAIN 1
 #define NO      2

@@ -21,7 +21,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
 }
 int checkBatteryLevel(){
   int adcValue = analogRead(BATTERY_PIN);
-  float voltage = adcValue * REFERENCE_VOLTAGE / 1023
+  float voltage = adcValue * REFERENCE_VOLTAGE / 1023;
   //int batteryLevel = map(constrain(voltage, 3.0, 9.0), 3.0, 9.0, 0, 100);
   int batteryLevel = map(voltage, 3.0, 9.0, 0, 100);
   return batteryLevel;
@@ -94,7 +94,7 @@ int response;
 bool username = true; // move to right location
 bool question = true; //move to right location
 
-void loop() {/* working progress, need to define pressed function and buttons
+void loop() { //working progress, need to define pressed function and buttons
   switch (state) {
     case BOOT:
       //display start up screen
@@ -116,29 +116,29 @@ void loop() {/* working progress, need to define pressed function and buttons
       state = 1;
     case VOTE:
       //display question
-      if (button_A) {
-        response = YES
+      if (ButtonYes.getState()) {
+        response = YES;
         state = 2;
       }
-      else if (button_B) {
-        response = ABSTAIN
+      else if (ButtonAbstain.getState()) {
+        response = ABSTAIN;
         state = 2;
       }
-      else if (button_C) {
-        response = NO
+      else if (ButtonNo.getState()) {
+        response = NO;
         state = 2;
       }
     case CONFIRM:
-      if (button_A) {
-        response = YES
+      if (ButtonYes.getState()) {
+        response = YES;
         state = 3;
       }
-      else if (button_C){
-        response = NO
+      else if (ButtonNo.getState()){
+        response = NO;
         state = 1;
       }
     case CLOSE_VOTE:
       //display closing thank you
       delay(5000);
-  }*/
+  }
 }
