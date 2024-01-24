@@ -2,20 +2,16 @@
 #include <ESP8266WiFi.h>  // default wifi library
 #include <PubSubClient.h> //Mqtt library by Nick O'Leary
 //#include <Wifi.h>
-
 #define BATTERY_PIN A0
 #define REFERENCE_VOLTAGE 3.3
 
 //Definition of GPIOS for Buttons
-#define BUTTON_PIN_1 5   // GPIO 5 (entspricht D1) für Taster 1
-#define BUTTON_PIN_2 4   // GPIO 4 (entspricht D2) für Taster 2
-#define BUTTON_PIN_3 16  // GPIO 16 (entspricht D0) für Taster 3
-#define RXPIN        3
+#define BUTTON_PIN_1 0   // GPIO 5 (entspricht D1) für Taster 1
+#define BUTTON_PIN_2 2   // GPIO 4 (entspricht D2) für Taster 2
+#define BUTTON_PIN_3 12  // GPIO 16 (entspricht D0) für Taster 3
 
-#include "Button_Class.h"
-ButtonVote ButtonYes;
-ButtonVote ButtonNo;
-ButtonVote ButtonAbstain;
+
+
 
 #define YES     0
 #define ABSTAIN 1
@@ -25,6 +21,7 @@ ButtonVote ButtonAbstain;
 #define VOTE        1
 #define CONFIRM     2
 #define CLOSE_VOTE  3
+
 
 
 
@@ -64,11 +61,6 @@ const char* pubPubVote = "/vote/VotingID";
 #include <encryptionlibrary.h>  //todo find encryption library
 #endif
 
-#ifdef STATUS_LEDS
-#define LED_PIN_1  14 // GPIO 14 (entspricht D5) für LED 1
-#define LED_PIN_2  12 // GPIO 12 (entspricht D6) für LED 2
-#define LED_PIN_3  13 // GPIO 13 (entspricht D7) für LED 3
-#endif
 
 #ifdef E_PAPER
 #include <E_Paper_Library.h> //todo find epaper library
@@ -77,9 +69,9 @@ const char* pubPubVote = "/vote/VotingID";
 #ifdef ISRS_FOR_BUTTONS
 #include "button_interrupts.h"
 void attachISR(void){
-  //attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_1), Isr_Btn_1, FALLING);
-  //attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_2), Isr_Btn_2, FALLING);
-  //attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_3), Isr_Btn_3, FALLING);
-  attachInterrupt(digitalPinToInterrupt(RXPIN), powerButtonInterrupt, FALLING);
+ // attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_1), Isr_Btn_1, FALLING);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_2), Isr_Btn_2, FALLING);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_3), Isr_Btn_3, FALLING);
+
 }
 #endif

@@ -10,4 +10,5 @@ private:
   void resetState(void);
 };
 
+
 #endif

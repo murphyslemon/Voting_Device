@@ -1,4 +1,8 @@
 #include "config.h"
+#include "power.h"
+#include "button_interrupts.h"
+//#include "Button_Class.h"
+
 
 int message_count = 0;
 
@@ -34,25 +38,20 @@ void setup() {
   pinMode(BUTTON_PIN_3, INPUT_PULLUP);  // Taster 3 als Eingang mit Pull-up-Widerstand
   */
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(BUTTON_PIN_1, OUTPUT);
-  digitalWrite(BUTTON_PIN_1, HIGH);
-  digitalWrite(LED_BUILTIN, HIGH);
+  pinMode(5, OUTPUT);
+  digitalWrite(5, HIGH);
+  digitalWrite(LED_BUILTIN, LOW);
   pinMode(RXPIN, INPUT_PULLUP);
+  pinMode(BUTTON_PIN_1, INPUT_PULLUP);
 #ifdef ISRS_FOR_BUTTONS
   attachISR();
-#endif
-
-#ifdef STATUS_LEDS
-  pinMode(LED_PIN_1, OUTPUT);  // LED 1 als Ausgang
-  pinMode(LED_PIN_2, OUTPUT);  // LED 2 als Ausgang
-  pinMode(LED_PIN_3, OUTPUT);  // LED 3 als Ausgang
 #endif
 
 #ifdef DEBUG
   Serial.begin(115200);
 #endif
   delay(10);
-
+/*
 // Verbindung zum WLAN herstellen
 #ifdef DEBUG
   Serial.println("Verbindung zum WLAN herstellen");
@@ -65,6 +64,7 @@ void setup() {
     Serial.print(".");
 #endif
   }
+  
 #ifdef DEBUG
   Serial.println("Verbindung zum WLAN hergestellt");
 #endif
@@ -86,6 +86,7 @@ void setup() {
 #ifdef DEBUG
   Serial.println("Verbindung zum MQTT-Server hergestellt");
 #endif
+*/
 }
 
 int state = 0;
@@ -95,8 +96,28 @@ bool username = true; // move to right location
 bool question = true; //move to right location
 
 void loop() { //working progress, need to define pressed function and buttons
+    //powerOff(); // RXPIN dose not work as interrupt, So we put it in main as a function for power off
+    if (!digitalRead(0)) {
+        Serial.println("YES");
+        response = YES;
+        //state = CONFIRM;
+      }
+      if (ButtonAbstain.getState()) {
+        Serial.println("ABSTAIN");
+        response = ABSTAIN;
+        //state = CONFIRM;
+      }
+      if (digitalRead(2)) {
+        Serial.println("NO");
+        response = NO;
+        //state = CONFIRM;
+      }
+      /*
+
   switch (state) {
+    
     case BOOT:
+  
       //display start up screen
       //check connection
       if (WiFi.status() != WL_CONNECTED) {
@@ -113,32 +134,41 @@ void loop() { //working progress, need to define pressed function and buttons
         //request question
       }
       //battery status
-      state = 1;
+      
+      state = VOTE;
     case VOTE:
       //display question
       if (ButtonYes.getState()) {
+        Serial.println("YES");
         response = YES;
-        state = 2;
+        state = CONFIRM;
       }
       else if (ButtonAbstain.getState()) {
+        Serial.println("ABSTAIN");
         response = ABSTAIN;
-        state = 2;
+        state = CONFIRM;
       }
       else if (ButtonNo.getState()) {
+        Serial.println("NO");
         response = NO;
-        state = 2;
+        state = CONFIRM;
       }
     case CONFIRM:
       if (ButtonYes.getState()) {
+        Serial.println("YES");
         response = YES;
-        state = 3;
+        state = CLOSE_VOTE;
       }
       else if (ButtonNo.getState()){
+        Serial.println("NO");
         response = NO;
-        state = 1;
+        state = VOTE;
       }
     case CLOSE_VOTE:
       //display closing thank you
       delay(5000);
   }
+
+*/
+  
 }
