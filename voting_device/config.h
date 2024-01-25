@@ -69,7 +69,7 @@ const char* pubPubVote = "/vote/VotingID";
 #ifdef ISRS_FOR_BUTTONS
 #include "button_interrupts.h"
 void attachISR(void){
- // attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_1), Isr_Btn_1, FALLING);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_1), Isr_Btn_1, FALLING);
   attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_2), Isr_Btn_2, FALLING);
   attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_3), Isr_Btn_3, FALLING);
 

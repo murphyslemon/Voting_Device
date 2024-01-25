@@ -1,8 +1,7 @@
 #include "config.h"
 #include "power.h"
 #include "button_interrupts.h"
-//#include "Button_Class.h"
-
+#include "display.h"
 
 int message_count = 0;
 

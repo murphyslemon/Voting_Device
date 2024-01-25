@@ -1,9 +1,7 @@
 #ifndef BUTTON_ISR
 #define BUTTON_ISR
 #include <Arduino.h>
-//#include "config.h"
 
-//#include "Button_Class.h"
 #include "Button_Class.h"
 extern ButtonVote ButtonYes;
 extern ButtonVote ButtonNo;

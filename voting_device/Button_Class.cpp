@@ -9,6 +9,7 @@ bool ButtonVote::getState(void){
 void ButtonVote::setState(bool State){
   ButtonVote::State = State;
 }
+
 void ButtonVote::resetState(void){
   ButtonVote::State = false;
 }
