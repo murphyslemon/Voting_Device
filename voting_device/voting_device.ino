@@ -31,17 +31,17 @@ int checkBatteryLevel(){
 }
 
 void setup() {
-  /*
+  
   pinMode(BUTTON_PIN_1, INPUT_PULLUP);  // Taster 1 als Eingang mit Pull-up-Widerstand
   pinMode(BUTTON_PIN_2, INPUT_PULLUP);  // Taster 2 als Eingang mit Pull-up-Widerstand
   pinMode(BUTTON_PIN_3, INPUT_PULLUP);  // Taster 3 als Eingang mit Pull-up-Widerstand
-  */
+  
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(5, OUTPUT);
   digitalWrite(5, HIGH);
   digitalWrite(LED_BUILTIN, LOW);
   pinMode(RXPIN, INPUT_PULLUP);
-  pinMode(BUTTON_PIN_1, INPUT_PULLUP);
+
 #ifdef ISRS_FOR_BUTTONS
   attachISR();
 #endif
@@ -96,28 +96,11 @@ bool question = true; //move to right location
 
 void loop() { //working progress, need to define pressed function and buttons
     //powerOff(); // RXPIN dose not work as interrupt, So we put it in main as a function for power off
-    if (!digitalRead(0)) {
-        Serial.println("YES");
-        response = YES;
-        //state = CONFIRM;
-      }
-      if (ButtonAbstain.getState()) {
-        Serial.println("ABSTAIN");
-        response = ABSTAIN;
-        //state = CONFIRM;
-      }
-      if (digitalRead(2)) {
-        Serial.println("NO");
-        response = NO;
-        //state = CONFIRM;
-      }
-      /*
-
   switch (state) {
     
     case BOOT:
-  
       //display start up screen
+      
       //check connection
       if (WiFi.status() != WL_CONNECTED) {
         //error msg
@@ -167,7 +150,4 @@ void loop() { //working progress, need to define pressed function and buttons
       //display closing thank you
       delay(5000);
   }
-
-*/
-  
 }
