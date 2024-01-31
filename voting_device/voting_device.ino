@@ -20,7 +20,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
   Serial.println();
   // Nachricht weiterleiten
-  //mqttClient.publish("e", payload, length);
+  mqttClient.publish("e", payload, length);
 }
 int checkBatteryLevel(){
   int adcValue = analogRead(BATTERY_PIN);
@@ -42,6 +42,10 @@ void setup() {
   digitalWrite(LED_BUILTIN, LOW);
   pinMode(RXPIN, INPUT_PULLUP);
 
+  initDisplay();
+
+  paintDragon();
+
 #ifdef ISRS_FOR_BUTTONS
   attachISR();
 #endif
@@ -50,7 +54,7 @@ void setup() {
   Serial.begin(115200);
 #endif
   delay(10);
-/*
+
 // Verbindung zum WLAN herstellen
 #ifdef DEBUG
   Serial.println("Verbindung zum WLAN herstellen");
@@ -71,9 +75,9 @@ void setup() {
   // Verbindung zum MQTT-Server herstellen
   mqttClient.setServer(mqtt_server, mqtt_port);
   mqttClient.setCallback(callback);
-  mqttClient.subscribe(subInit, MQTTsubQos);
-  mqttClient.subscribe(subResync, MQTTsubQos);
-  mqttClient.subscribe(subVoteSetup, MQTTsubQos);
+  //mqttClient.subscribe(subInit, MQTTsubQos);
+  //mqttClient.subscribe(subResync, MQTTsubQos);
+  //mqttClient.subscribe(subVoteSetup, MQTTsubQos);
 
   while (!mqttClient.connected()) {
 #ifdef DEBUG
@@ -82,10 +86,11 @@ void setup() {
     mqttClient.connect("ESP8266", mqtt_user, mqtt_password);
     delay(500);
   }
+  mqttClient.publish("e", "payload");
 #ifdef DEBUG
   Serial.println("Verbindung zum MQTT-Server hergestellt");
 #endif
-*/
+mqttClient.subscribe("/registration/esp/1A", MQTTsubQos);
 }
 
 int state = 0;
@@ -96,6 +101,8 @@ bool question = true; //move to right location
 
 void loop() { //working progress, need to define pressed function and buttons
     //powerOff(); // RXPIN dose not work as interrupt, So we put it in main as a function for power off
+    mqttClient.loop();
+    /*
   switch (state) {
     
     case BOOT:
@@ -149,5 +156,5 @@ void loop() { //working progress, need to define pressed function and buttons
     case CLOSE_VOTE:
       //display closing thank you
       delay(5000);
-  }
+  }*/
 }

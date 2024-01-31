@@ -31,7 +31,7 @@ const char* ssid = "franks_galaxy";
 const char* password = "veef2267";
 
 // MQTT-Server Settings
-const char* mqtt_server = "10.42.0.1";
+const char* mqtt_server = "194.110.231.227";
 const int mqtt_port = 1883;
 const char* mqtt_user = "";
 const char* mqtt_password = "";
