@@ -19,9 +19,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.print((char)payload[i]);
   }
   Serial.println();
-  // Nachricht weiterleiten
-  mqttClient.publish("e", payload, length);
 }
+
 int checkBatteryLevel(){
   int adcValue = analogRead(BATTERY_PIN);
   float voltage = adcValue * REFERENCE_VOLTAGE / 1023;
@@ -46,34 +45,27 @@ void setup() {
   char question[100] = "How many characters can E-paper fit across?";
   char question2[] = "In this example, exampleString is a character array containing the string Hello, World!. The strlen function is then u Hello, World!.";
   paintVoteScreen(question2);
-/*
-#ifdef ISRS_FOR_BUTTONS
+
   attachISR();
-#endif
 
 #ifdef DEBUG
   Serial.begin(115200);
 #endif
   delay(10);
-
-// Verbindung zum WLAN herstellen
 #ifdef DEBUG
-  Serial.println("Connect to WiFi");
+  Serial.println("Connecting to WiFi");
 #endif
   WiFi.begin(ssid, password);
-
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
 #ifdef DEBUG
     Serial.print(".");
 #endif
   }
-  
 #ifdef DEBUG
   Serial.println("Connected to WiFi established");
 #endif
 
-  // Verbindung zum MQTT-Server herstellen
   mqttClient.setServer(mqtt_server, mqtt_port);
   mqttClient.setCallback(callback);
   //mqttClient.subscribe(subInit, MQTTsubQos);
@@ -82,17 +74,22 @@ void setup() {
 
   while (!mqttClient.connected()) {
 #ifdef DEBUG
-    Serial.println("Connect to the MQTT server");
+    Serial.println("Connecting to the MQTT server");
 #endif
     mqttClient.connect("ESP8266", mqtt_user, mqtt_password);
     delay(500);
   }
-  mqttClient.publish("e", "payload");
+  char macAddress[18] = "\0";
+  strcpy(macAddress, "Mac :");
+  strcat(macAddress, WiFi.macAddress().c_str());
 #ifdef DEBUG
   Serial.println("Connection to MQTT server established");
+  Serial.println(macAddress);
+  Serial.println((WiFi.macAddress()).c_str());
 #endif
-mqttClient.subscribe("/registration/esp/1A", MQTTsubQos);
-*/
+
+  mqttClient.publish("Nadim", macAddress);
+  mqttClient.subscribe("/registration/esp/1A", MQTTsubQos);
 }
 
 int state = 0;
@@ -106,20 +103,10 @@ void loop() { //working progress, need to define pressed function and buttons
     mqttClient.loop();
     /*
   switch (state) {
-    
     case BOOT:
       //display start up screen
-      
-      //check connection
-      if (WiFi.status() != WL_CONNECTED) {
-        //error msg
-        //try connect again
-      } 
       //receive user name and vote question
-      if (!username) {
-        //error msg
-        //request user name
-      }
+      // Nachricht weiterleiten
       if (!question) {
         //error msg
         //request question
@@ -158,5 +145,6 @@ void loop() { //working progress, need to define pressed function and buttons
     case CLOSE_VOTE:
       //display closing thank you
       delay(5000);
-  }*/
+  }
+  */
 }
