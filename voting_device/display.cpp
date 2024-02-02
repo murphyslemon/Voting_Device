@@ -41,7 +41,7 @@ void initDisplay(){
   paint.SetRotate(ROTATE_270); //rotate screen 
 }
 
-void paintVoteScreen() {
+void paintVoteScreen(const char *question) {
   //wifilogo
     paint.SetWidth(35);
     paint.SetHeight(35);
@@ -51,7 +51,7 @@ void paintVoteScreen() {
   //battery logo
     paint.Clear(UNCOLORED);
     drawImage(0, 0, 35, 35, batterylogo); // draw the image at (0, 0) coordinates
-    epd.SetFrameMemory(paint.GetImage(), 0, (200-35), paint.GetWidth(), paint.GetHeight());
+    epd.SetFrameMemory(paint.GetImage(), 0, (200-35-3), paint.GetWidth(), paint.GetHeight());
   //battery status bar
     //paint.SetWidth(20);
     //paint.SetHeight(13);
@@ -61,8 +61,8 @@ void paintVoteScreen() {
   //Bottom bar
     paint.SetWidth(22);
     paint.SetHeight(200);
-    paint.Clear(COLORED); //paints the height and width the given colour
-    paint.DrawStringAt(0, 0, "YES ABSTAIN NO", &Font20, UNCOLORED); //moves text to co-ordinates with-in the set height and width
+    paint.Clear(UNCOLORED); //paints the height and width the given colour
+    paint.DrawStringAt(0, 0, "YES ABSTAIN NO", &Font20, COLORED); //moves text to co-ordinates with-in the set height and width
     //paint.DrawStringAt(0, 2, "Yes   Abstain   No", &Font16, COLORED);
     //paint.DrawFilledRectangle(0, 0, 200, 3, UNCOLORED);
     //paint.DrawFilledRectangle(48, 0, 50, 25, UNCOLORED);
@@ -71,17 +71,20 @@ void paintVoteScreen() {
   //Name
 
   //Question
-    char question[100] = "How many characters can E-paper fit across?";
-    char question2[100] = "Pneumonoultramicroscopicsilicovolcanoconiosis is a long question another another?";
+    //char question[100] = "How many characters can E-paper fit across?";
+    //char question2[100] = "Pneumonoultramicroscopicsilicovolcanoconiosis is a long question another another?";
     int position = 0;
     char line[16];
-
-    bool all_good = check_question(question1, line, &position);
-    if (all_good) {
-        position = 0;
-        display_question(question1, line, &position);
+    size_t sizeOfString = strlen(question);  // Size of the string
+    if(sizeOfString <= 90){
+      display_question(question, line, &position);
     }
-
+    else {
+    char stringMod[90]; // Including space for null terminator
+    strncpy(stringMod, question, 90);
+    stringMod[89] = '\0';
+    display_question(stringMod, line, &position); // Pass the modified string to display_question
+    }
     epd.DisplayFrame();
 }
 
@@ -98,54 +101,11 @@ void drawImage(int x, int y, int width, int height, const unsigned char *image) 
     }
 }
 
-bool question_mark(const char *question) {
-    int question_len = strlen(question);
-    if (question_len > 0 && question[question_len - 1] == '?') {
-        return true;
-    }
-    return false;
-}
-
-bool check_question(const char *question, char *line, int *position) {
-    if (!question_mark(question)) {
-        printf("ERROR: No question mark!");
-        return false;
-    }
-    int count = 0;
-    do {
-        strncpy(line, question + *position, 15);
-        line[15] = '\0';
-
-        int pos = 15;
-        int extra = 0;
-        while (pos >= 0 && line[pos] != ' ') {
-            pos--;
-            extra++;
-        }
-        line[pos] = '\0';
-
-        if (extra == 16) {
-            line[14] = '-';
-            *position -= 1;  // Update position to after the '-'
-        } else {
-            *position -= extra;  // Update position to the last space
-            *position += 1;  // Update position to after the space
-        }
-        printf("%s\n", line);
-        *position += 15;
-        count++;
-    } while (!question_mark(line));
-
-    if (count > 6) {
-        printf("ERROR: Question too long!");
-        return false;
-    }
-    return true;
-}
 
 void display_question(const char *question, char *line, int *position) {
-    paint.SetWidth(200);
-    paint.SetHeight(16);
+    size_t sizeOfString = strlen(question);
+    paint.SetWidth(16);
+    paint.SetHeight(200);
     int count = 0;
     do {
         strncpy(line, question + *position, 15);
@@ -167,11 +127,11 @@ void display_question(const char *question, char *line, int *position) {
             *position += 1;  // Update position to after the space
         }
         paint.Clear(UNCOLORED); //paints the height and width the given colour
-        paint.DrawStringAt(15, 2, line, &Font16, COLORED); //moves text to co-ordinates with-in the set height and width
-        epd.SetFrameMemory(paint.GetImage(), 0, (120-(count*16)), paint.GetWidth(), paint.GetHeight()); //moves page to co-ordinate
+        paint.DrawStringAt(20, 0, line, &Font16, COLORED); //moves text to co-ordinates with-in the set height and width
+        epd.SetFrameMemory(paint.GetImage(), (40+(count*16)),0, paint.GetWidth(), paint.GetHeight()); //moves page to co-ordinate
         *position += 15;
         count++;
-    } while (!question_mark(line));
+    } while ((*position) < sizeOfString);
 }
 
 void displayWifi(){

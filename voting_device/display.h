@@ -11,7 +11,7 @@
 
 void initDisplay();
 
-void paintVoteScreen();
+void paintVoteScreen(const char *question);
 
 //Epaper object declaration
 //Epd epd;

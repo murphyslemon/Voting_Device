@@ -43,8 +43,9 @@ void setup() {
   pinMode(RXPIN, INPUT_PULLUP);
 
   initDisplay();
-
-  paintVoteScreen();
+  char question[100] = "How many characters can E-paper fit across?";
+  char question2[] = "In this example, exampleString is a character array containing the string Hello, World!. The strlen function is then u Hello, World!.";
+  paintVoteScreen(question2);
 /*
 #ifdef ISRS_FOR_BUTTONS
   attachISR();
