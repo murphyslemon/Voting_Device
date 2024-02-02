@@ -9,6 +9,8 @@ int message_count = 0;
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
 
+String id;
+
 // MQTT-Nachrichten verarbeiten
 void callback(char* topic, byte* payload, unsigned int length) {
   // Nachricht ausgeben
@@ -18,11 +20,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
   for (int i = 0; i < length; i++) {
     Serial.print((char)payload[i]);
   }
+  id = String((char*)payload);
   Serial.println();
-<<<<<<< HEAD
- // mqttClient.publish("e", payload, length);
-=======
->>>>>>> 75a085756ba9883d9afb9ed965c5ea0600391a02
 }
 
 int checkBatteryLevel(){
@@ -49,11 +48,6 @@ void setup() {
   char question[100] = "How many characters can E-paper fit across?";
   char question2[] = "In this example, exampleString is a character array containing the string Hello, World!. The strlen function is then u Hello, World!.";
   paintVoteScreen(question2);
-
-<<<<<<< HEAD
-#ifdef ISRS_FOR_BUTTONS
-=======
->>>>>>> 75a085756ba9883d9afb9ed965c5ea0600391a02
   attachISR();
 
 #ifdef DEBUG
@@ -84,30 +78,36 @@ void setup() {
     mqttClient.connect("ESP8266", mqtt_user, mqtt_password);
     delay(500);
   }
-  char macAddress[18] = "\0";
-  strcpy(macAddress, "Mac :");
-  strcat(macAddress, WiFi.macAddress().c_str());
 #ifdef DEBUG
   Serial.println("Connection to MQTT server established");
-  Serial.println(macAddress);
   Serial.println((WiFi.macAddress()).c_str());
+  //String rawMacAddress = String(WiFi.macAddress());
+  String macAddress = "Mac : " + String(WiFi.macAddress());
+  //String Nadim = "/registration/Server/"+ String(WiFi.macAddress());
+  
+Serial.println(macAddress);
 #endif
-    mqttClient.subscribe(subInit, MQTTsubQos);
-    mqttClient.subscribe(subResync, MQTTsubQos);
-    mqttClient.subscribe(subVoteSetup, MQTTsubQos);
-  mqttClient.publish("Nadim", macAddress);
-  mqttClient.subscribe("/registration/esp/1A", MQTTsubQos);
+    //mqttClient.publish(pubInit.c_str(), macAddress.c_str());
+    mqttClient.subscribe(subInit.c_str(), MQTTsubQos);
+    //mqttClient.subscribe(subResync, MQTTsubQos);
+    //mqttClient.subscribe(subVoteSetup, MQTTsubQos);
 
-
+}
 int state = 0;
 int response;
 
-bool username = true; // move to right location
-bool question = true; //move to right location
+//bool username = true; // move to right location
+//bool question = true; //move to right location
 
 void loop() { //working progress, need to define pressed function and buttons
     //powerOff(); // RXPIN dose not work as interrupt, So we put it in main as a function for power off
     mqttClient.loop();
+    /*
+    if(id){
+      Serial.println(id);
+      id = '\0';
+    }
+    */
     /*
   switch (state) {
     case BOOT:

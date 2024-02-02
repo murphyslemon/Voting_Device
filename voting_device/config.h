@@ -28,8 +28,8 @@
 
 
 // WLAN-Settings
-const char* ssid = "franks_galaxy";
-const char* password = "veef2267";
+const char* ssid = "Nadim";
+const char* password = "nadimahmed";
 
 // MQTT-Server Settings
 const char* mqtt_server = "194.110.231.227";
@@ -39,13 +39,13 @@ const char* mqtt_password = "";
 #define MQTTpubQos 1                  
 #define MQTTsubQos 1
 
-// MQTT topics to subscribe
+//Mqtt topics to publish
+const String pubInit = "/registration/Server/"+ String(WiFi.macAddress());
 
-const char* subInit = ("/registration/esp/"+WiFi.macAddress()).c_str();
+// MQTT topics to subscribe
+const String subInit = "/registration/esp/"+ String(WiFi.macAddress());
 const char* subVoteSetup = "/setupVote/Setup";
 const char* subResync = "/setupVote/Resync";
-//Mqtt topics to publish
-const char* pubInit = ("/registration/Server/"+WiFi.macAddress()).c_str();
 
 const char* pubPubVote = "/vote/VotingID";
 
