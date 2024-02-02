@@ -19,8 +19,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.print((char)payload[i]);
   }
   Serial.println();
-  // Nachricht weiterleiten
-  mqttClient.publish("e", payload, length);
+ // mqttClient.publish("e", payload, length);
 }
 int checkBatteryLevel(){
   int adcValue = analogRead(BATTERY_PIN);
@@ -46,7 +45,7 @@ void setup() {
   char question[100] = "How many characters can E-paper fit across?";
   char question2[] = "In this example, exampleString is a character array containing the string Hello, World!. The strlen function is then u Hello, World!.";
   paintVoteScreen(question2);
-/*
+
 #ifdef ISRS_FOR_BUTTONS
   attachISR();
 #endif
@@ -68,7 +67,7 @@ void setup() {
     Serial.print(".");
 #endif
   }
-  
+
 #ifdef DEBUG
   Serial.println("Connected to WiFi established");
 #endif
@@ -76,9 +75,6 @@ void setup() {
   // Verbindung zum MQTT-Server herstellen
   mqttClient.setServer(mqtt_server, mqtt_port);
   mqttClient.setCallback(callback);
-  //mqttClient.subscribe(subInit, MQTTsubQos);
-  //mqttClient.subscribe(subResync, MQTTsubQos);
-  //mqttClient.subscribe(subVoteSetup, MQTTsubQos);
 
   while (!mqttClient.connected()) {
 #ifdef DEBUG
@@ -91,8 +87,9 @@ void setup() {
 #ifdef DEBUG
   Serial.println("Connection to MQTT server established");
 #endif
-mqttClient.subscribe("/registration/esp/1A", MQTTsubQos);
-*/
+    mqttClient.subscribe(subInit, MQTTsubQos);
+    mqttClient.subscribe(subResync, MQTTsubQos);
+    mqttClient.subscribe(subVoteSetup, MQTTsubQos);
 }
 
 int state = 0;

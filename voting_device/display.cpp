@@ -118,7 +118,7 @@ void display_question(const char *question, char *line, int *position) {
             extra++;
         }
         line[pos] = '\0';
-
+        
         if (extra == 16) {
             line[14] = '-';
             *position -= 1;  // Update position to after the '-'
