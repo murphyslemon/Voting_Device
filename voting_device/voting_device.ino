@@ -12,7 +12,7 @@ PubSubClient mqttClient(wifiClient);
 // MQTT-Nachrichten verarbeiten
 void callback(char* topic, byte* payload, unsigned int length) {
   // Nachricht ausgeben
-  Serial.print("Nachricht empfangen: ");
+  Serial.print("Message received: ");
   Serial.print(topic);
   Serial.print(" : ");
   for (int i = 0; i < length; i++) {
@@ -44,8 +44,8 @@ void setup() {
 
   initDisplay();
 
-  paintDragon();
-
+  paintVoteScreen();
+/*
 #ifdef ISRS_FOR_BUTTONS
   attachISR();
 #endif
@@ -57,7 +57,7 @@ void setup() {
 
 // Verbindung zum WLAN herstellen
 #ifdef DEBUG
-  Serial.println("Verbindung zum WLAN herstellen");
+  Serial.println("Connect to WiFi");
 #endif
   WiFi.begin(ssid, password);
 
@@ -69,7 +69,7 @@ void setup() {
   }
   
 #ifdef DEBUG
-  Serial.println("Verbindung zum WLAN hergestellt");
+  Serial.println("Connected to WiFi established");
 #endif
 
   // Verbindung zum MQTT-Server herstellen
@@ -81,16 +81,17 @@ void setup() {
 
   while (!mqttClient.connected()) {
 #ifdef DEBUG
-    Serial.println("Verbindung zum MQTT-Server herstellen");
+    Serial.println("Connect to the MQTT server");
 #endif
     mqttClient.connect("ESP8266", mqtt_user, mqtt_password);
     delay(500);
   }
   mqttClient.publish("e", "payload");
 #ifdef DEBUG
-  Serial.println("Verbindung zum MQTT-Server hergestellt");
+  Serial.println("Connection to MQTT server established");
 #endif
 mqttClient.subscribe("/registration/esp/1A", MQTTsubQos);
+*/
 }
 
 int state = 0;

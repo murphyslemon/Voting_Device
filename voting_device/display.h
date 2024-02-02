@@ -11,7 +11,7 @@
 
 void initDisplay();
 
-void paintDragon();
+void paintVoteScreen();
 
 //Epaper object declaration
 //Epd epd;

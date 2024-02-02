@@ -15,6 +15,21 @@ const unsigned char wifilogo[] PROGMEM = {
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
+const unsigned char batterylogo[] PROGMEM = {
+// 'imresizer-1702234758351', 35x35px
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+0x00, 0x00, 0x00, 0x07, 0xff, 0xff, 0xe0, 0x00, 0x1f, 0xff, 0xff, 0xf8, 0x00, 0x3f, 0xff, 0xff, 
+0xfc, 0x00, 0x38, 0x00, 0x00, 0x1e, 0x00, 0x78, 0x00, 0x00, 0x0e, 0x00, 0x70, 0x00, 0x00, 0x0e, 
+0x00, 0x70, 0x00, 0x00, 0x0f, 0x80, 0x70, 0x00, 0x00, 0x0f, 0x80, 0x70, 0x00, 0x00, 0x0f, 0xc0, 
+0x70, 0x00, 0x00, 0x0f, 0xc0, 0x70, 0x00, 0x00, 0x0f, 0xc0, 0x70, 0x00, 0x00, 0x0f, 0xc0, 0x70, 
+0x00, 0x00, 0x0f, 0xc0, 0x70, 0x00, 0x00, 0x0f, 0x80, 0x70, 0x00, 0x00, 0x0f, 0x80, 0x70, 0x00, 
+0x00, 0x0e, 0x00, 0x70, 0x00, 0x00, 0x0e, 0x00, 0x38, 0x00, 0x00, 0x1e, 0x00, 0x3f, 0xff, 0xff, 
+0xfc, 0x00, 0x1f, 0xff, 0xff, 0xf8, 0x00, 0x0f, 0xff, 0xff, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+
 Epd epd;
 unsigned char image[1024];
 Paint paint(image, 0, 0);
@@ -23,16 +38,51 @@ void initDisplay(){
    //E-paper init
   epd.LDirInit();
   epd.Clear(); // clears whole screen to white
-  paint.SetRotate(ROTATE_180); //rotate screen 
+  paint.SetRotate(ROTATE_270); //rotate screen 
 }
 
-void paintDragon() {
+void paintVoteScreen() {
   //wifilogo
     paint.SetWidth(35);
     paint.SetHeight(35);
-    paint.Clear(COLORED); // paints the height and width with the given color
+    paint.Clear(UNCOLORED); // paints the height and width with the given color
     drawImage(0, 0, 35, 35, wifilogo); // draw the image at (0, 0) coordinates
-    epd.SetFrameMemory(paint.GetImage(), 40, (200-35), paint.GetWidth(), paint.GetHeight());
+    epd.SetFrameMemory(paint.GetImage(), 0, 0, paint.GetWidth(), paint.GetHeight());
+  //battery logo
+    paint.Clear(UNCOLORED);
+    drawImage(0, 0, 35, 35, batterylogo); // draw the image at (0, 0) coordinates
+    epd.SetFrameMemory(paint.GetImage(), 0, (200-35), paint.GetWidth(), paint.GetHeight());
+  //battery status bar
+    //paint.SetWidth(20);
+    //paint.SetHeight(13);
+    //paint.Clear(COLORED);
+    //paint.DrawFilledRectangle(0, 0, 20, 14, COLORED);
+    //epd.SetFrameMemory(paint.GetImage(), 16, (200-23), paint.GetWidth(), paint.GetHeight());
+  //Bottom bar
+    paint.SetWidth(22);
+    paint.SetHeight(200);
+    paint.Clear(COLORED); //paints the height and width the given colour
+    paint.DrawStringAt(0, 0, "YES ABSTAIN NO", &Font20, UNCOLORED); //moves text to co-ordinates with-in the set height and width
+    //paint.DrawStringAt(0, 2, "Yes   Abstain   No", &Font16, COLORED);
+    //paint.DrawFilledRectangle(0, 0, 200, 3, UNCOLORED);
+    //paint.DrawFilledRectangle(48, 0, 50, 25, UNCOLORED);
+    //paint.DrawFilledRectangle(160, 0, 162, 25, UNCOLORED);
+    epd.SetFrameMemory(paint.GetImage(), (200-22), 0, paint.GetWidth(), paint.GetHeight()); //moves page to co-ordinates
+  //Name
+
+  //Question
+    char question[100] = "How many characters can E-paper fit across?";
+    char question2[100] = "Pneumonoultramicroscopicsilicovolcanoconiosis is a long question another another?";
+    int position = 0;
+    char line[16];
+
+    bool all_good = check_question(question1, line, &position);
+    if (all_good) {
+        position = 0;
+        display_question(question1, line, &position);
+    }
+
+    epd.DisplayFrame();
 }
 
 void drawImage(int x, int y, int width, int height, const unsigned char *image) {
