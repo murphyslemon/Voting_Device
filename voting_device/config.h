@@ -11,25 +11,19 @@
 #define BUTTON_PIN_2 2   // GPIO 4 (entspricht D2) für Taster 2
 #define BUTTON_PIN_3 12  // GPIO 16 (entspricht D0) für Taster 3
 
-
-
-
 #define YES     0
 #define ABSTAIN 1
 #define NO      2
 
 #define BOOT        0
-#define VOTE        1
-#define CONFIRM     2
-#define CLOSE_VOTE  3
-
-
-
-
+#define QUESTION    1
+#define VOTE        2
+#define CONFIRM     3
+#define CLOSE_VOTE  4
 
 // WLAN-Settings
-const char* ssid = "Nadim";
-const char* password = "nadimahmed";
+const char* ssid = "franks_galaxy";
+const char* password = "veef2267";
 
 // MQTT-Server Settings
 const char* mqtt_server = "194.110.231.227";
@@ -41,14 +35,12 @@ const char* mqtt_password = "";
 
 //Mqtt topics to publish
 const String pubInit = "/registration/Server/"+ String(WiFi.macAddress());
+const char* pubPubVote = "/vote/";
 
 // MQTT topics to subscribe
 const String subInit = "/registration/esp/"+ String(WiFi.macAddress());
 const char* subVoteSetup = "/setupVote/Setup";
 const char* subResync = "/setupVote/Resync";
-
-const char* pubPubVote = "/vote/VotingID";
-
 
 //configuration of functionality
 //#define ENCRYPTION
@@ -58,14 +50,8 @@ const char* pubPubVote = "/vote/VotingID";
 #define ISRS_FOR_BUTTONS
 
 //Includes according to config
-
 #ifdef ENCRYPTION
 #include <encryptionlibrary.h>  //todo find encryption library
-#endif
-
-
-#ifdef E_PAPER
-#include <E_Paper_Library.h> //todo find epaper library
 #endif
 
 #ifdef ISRS_FOR_BUTTONS

@@ -9,19 +9,14 @@ int message_count = 0;
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
 
-String id;
+char MQTTmsg[] = "This is a test string for payload";
+bool flag = 0;
 
 // MQTT-Nachrichten verarbeiten
 void callback(char* topic, byte* payload, unsigned int length) {
-  // Nachricht ausgeben
-  Serial.print("Message received: ");
-  Serial.print(topic);
-  Serial.print(" : ");
-  for (int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
-  }
-  id = String((char*)payload);
-  Serial.println();
+  memcpy(MQTTmsg, payload, length);
+  MQTTmsg[length] = '\0';
+  flag = 1;
 }
 
 int checkBatteryLevel(){
@@ -47,7 +42,6 @@ void setup() {
   initDisplay();
   char question[100] = "How many characters can E-paper fit across?";
   char question2[] = "In this example, exampleString is a character array containing the string Hello, World!. The strlen function is then u Hello, World!.";
-  paintVoteScreen(question2);
   attachISR();
 
 #ifdef DEBUG
@@ -87,71 +81,75 @@ void setup() {
   
 Serial.println(macAddress);
 #endif
-    //mqttClient.publish(pubInit.c_str(), macAddress.c_str());
-    mqttClient.subscribe(subInit.c_str(), MQTTsubQos);
+    mqttClient.publish(pubInit.c_str(), macAddress.c_str());  //send mac address
+    mqttClient.subscribe(subInit.c_str(), MQTTsubQos); //recieve voting ID
     //mqttClient.subscribe(subResync, MQTTsubQos);
-    //mqttClient.subscribe(subVoteSetup, MQTTsubQos);
+    mqttClient.subscribe(subVoteSetup, MQTTsubQos); //recieve question
 
 }
 int state = 0;
-int response;
+char response[10] = "";
+char votingID[20] = "";
+char pubTopicVoteResponse[50] = "";
+char voteTitle[256] = "";
 
 //bool username = true; // move to right location
 //bool question = true; //move to right location
 
 void loop() { //working progress, need to define pressed function and buttons
     //powerOff(); // RXPIN dose not work as interrupt, So we put it in main as a function for power off
-    mqttClient.loop();
-    /*
-    if(id){
-      Serial.println(id);
-      id = '\0';
-    }
-    */
-    /*
   switch (state) {
     case BOOT:
-      //display start up screen
-      //receive user name and vote question
-      // Nachricht weiterleiten
-      if (!question) {
+  //display start up screen
+      if (flag) {
+        flag = 0;
+        strcpy(votingID, MQTTmsg);
+        Serial.println(MQTTmsg);
+        state = QUESTION; 
+      }
+      //if (!question) {
         //error msg
         //request question
-      }
+      //}
       //battery status
-      
-      state = VOTE;
+    case QUESTION:
+      if (flag) {
+        flag = 0;
+        Serial.println(MQTTmsg);
+        strcpy(voteTitle, MQTTmsg);
+        paintVoteScreen(voteTitle);
+        state = VOTE;
+      }
     case VOTE:
       //display question
+      strcat(pubTopicVoteResponse, pubPubVote);
+      strcat(pubTopicVoteResponse, votingID);
       if (ButtonYes.getState()) {
+        strcpy(response, "Yes");
         Serial.println("YES");
-        response = YES;
         state = CONFIRM;
       }
       else if (ButtonAbstain.getState()) {
-        Serial.println("ABSTAIN");
-        response = ABSTAIN;
+        strcpy(response, "Pass");
+        Serial.println("PASS");
         state = CONFIRM;
       }
       else if (ButtonNo.getState()) {
+        strcpy(response, "No");
         Serial.println("NO");
-        response = NO;
         state = CONFIRM;
       }
     case CONFIRM:
       if (ButtonYes.getState()) {
-        Serial.println("YES");
-        response = YES;
+        mqttClient.publish(pubPubVote, response);
         state = CLOSE_VOTE;
       }
       else if (ButtonNo.getState()){
-        Serial.println("NO");
-        response = NO;
         state = VOTE;
       }
     case CLOSE_VOTE:
       //display closing thank you
       delay(5000);
   }
-  */
+  mqttClient.loop();
 }
