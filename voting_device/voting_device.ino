@@ -42,7 +42,7 @@ void setup() {
   initDisplay();
   char question[100] = "How many characters can E-paper fit across?";
   char question2[] = "In this example, exampleString is a character array containing the string Hello, World!. The strlen function is then u Hello, World!.";
-  attachISR();
+  //attachISR();
 
 #ifdef DEBUG
   Serial.begin(115200);
@@ -112,44 +112,55 @@ void loop() { //working progress, need to define pressed function and buttons
         //request question
       //}
       //battery status
+      break;
     case QUESTION:
       if (flag) {
         flag = 0;
         Serial.println(MQTTmsg);
         strcpy(voteTitle, MQTTmsg);
         paintVoteScreen(voteTitle);
+        strcat(pubTopicVoteResponse, pubPubVote);
+        strcat(pubTopicVoteResponse, votingID);
         state = VOTE;
       }
+      break;
     case VOTE:
       //display question
-      strcat(pubTopicVoteResponse, pubPubVote);
-      strcat(pubTopicVoteResponse, votingID);
-      if (ButtonYes.getState()) {
+      //strcpy(response, "Yes");
+      //state = CONFIRM;
+      if (!digitalRead(12)) {
+        delay(500);
         strcpy(response, "Yes");
         Serial.println("YES");
         state = CONFIRM;
-      }
-      else if (ButtonAbstain.getState()) {
+      }/*
+      else if (digitalRead(2)) {
         strcpy(response, "Pass");
         Serial.println("PASS");
         state = CONFIRM;
       }
-      else if (ButtonNo.getState()) {
+      else if (digitalRead(12)) {
         strcpy(response, "No");
         Serial.println("NO");
         state = CONFIRM;
-      }
+      }*/
+      break;
     case CONFIRM:
-      if (ButtonYes.getState()) {
+      if (digitalRead(12)) {
+        delay(500);
         mqttClient.publish(pubPubVote, response);
         state = CLOSE_VOTE;
       }
-      else if (ButtonNo.getState()){
+      else if (!digitalRead(0)){
         state = VOTE;
       }
+      break;
     case CLOSE_VOTE:
       //display closing thank you
-      delay(5000);
+      Serial.println("voting ending");
+      delay(2000);
+      state = BOOT;
+      break;
   }
   mqttClient.loop();
 }
