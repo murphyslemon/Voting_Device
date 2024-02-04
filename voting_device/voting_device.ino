@@ -28,17 +28,17 @@ int checkBatteryLevel(){
 }
 
 void setup() {
-  
+  //button initialization
   pinMode(BUTTON_PIN_1, INPUT_PULLUP);  // Taster 1 als Eingang mit Pull-up-Widerstand
   pinMode(BUTTON_PIN_2, INPUT_PULLUP);  // Taster 2 als Eingang mit Pull-up-Widerstand
   pinMode(BUTTON_PIN_3, INPUT_PULLUP);  // Taster 3 als Eingang mit Pull-up-Widerstand
-  
+  //LED initialization
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(5, OUTPUT);
   digitalWrite(5, HIGH);
   digitalWrite(LED_BUILTIN, LOW);
   pinMode(RXPIN, INPUT_PULLUP);
-
+  //Display initialization
   initDisplay();
   char question[100] = "How many characters can E-paper fit across?";
   char question2[] = "In this example, exampleString is a character array containing the string Hello, World!. The strlen function is then u Hello, World!.";
@@ -85,18 +85,17 @@ Serial.println(macAddress);
     mqttClient.subscribe(subInit.c_str(), MQTTsubQos); //recieve voting ID
     //mqttClient.subscribe(subResync, MQTTsubQos);
     mqttClient.subscribe(subVoteSetup, MQTTsubQos); //recieve question
-
+    
 }
+
 int state = 0;
+int batteryPercentage = 20;
 char response[10] = "";
 char votingID[20] = "";
 char pubTopicVoteResponse[50] = "";
 char voteTitle[256] = "";
 
-//bool username = true; // move to right location
-//bool question = true; //move to right location
-
-void loop() { //working progress, need to define pressed function and buttons
+void loop() {
     //powerOff(); // RXPIN dose not work as interrupt, So we put it in main as a function for power off
   switch (state) {
     case BOOT:
@@ -107,44 +106,43 @@ void loop() { //working progress, need to define pressed function and buttons
         Serial.println(MQTTmsg);
         state = QUESTION; 
       }
-      //if (!question) {
-        //error msg
-        //request question
-      //}
       //battery status
       break;
+
     case QUESTION:
       if (flag) {
         flag = 0;
         Serial.println(MQTTmsg);
         strcpy(voteTitle, MQTTmsg);
-        paintVoteScreen(voteTitle);
+        paintVoteScreen(voteTitle, batteryPercentage);
         strcat(pubTopicVoteResponse, pubPubVote);
         strcat(pubTopicVoteResponse, votingID);
         state = VOTE;
       }
       break;
+
     case VOTE:
-      //display question
-      //strcpy(response, "Yes");
-      //state = CONFIRM;
       if (!digitalRead(12)) {
         delay(500);
         strcpy(response, "Yes");
+        paintConfirmScreen(response, batteryPercentage);
         Serial.println("YES");
         state = CONFIRM;
-      }/*
+      }
       else if (digitalRead(2)) {
         strcpy(response, "Pass");
+        paintConfirmScreen(response, batteryPercentage);
         Serial.println("PASS");
         state = CONFIRM;
       }
       else if (digitalRead(12)) {
         strcpy(response, "No");
+        paintConfirmScreen(response, batteryPercentage);
         Serial.println("NO");
         state = CONFIRM;
-      }*/
+      }
       break;
+
     case CONFIRM:
       if (digitalRead(12)) {
         delay(500);
@@ -152,9 +150,11 @@ void loop() { //working progress, need to define pressed function and buttons
         state = CLOSE_VOTE;
       }
       else if (!digitalRead(0)){
+        paintVoteScreen(voteTitle, batteryPercentage);
         state = VOTE;
       }
       break;
+
     case CLOSE_VOTE:
       //display closing thank you
       Serial.println("voting ending");
@@ -162,5 +162,6 @@ void loop() { //working progress, need to define pressed function and buttons
       state = BOOT;
       break;
   }
+  */
   mqttClient.loop();
 }

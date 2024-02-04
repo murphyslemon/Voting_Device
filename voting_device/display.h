@@ -9,22 +9,15 @@
 #define COLORED     0
 #define UNCOLORED   1
 
+//Display functions called in voting_device.ino
 void initDisplay();
 
-void paintVoteScreen(const char *question);
+void paintVoteScreen(const char *question, int batteryLevel);
 
-//Epaper object declaration
-//Epd epd;
-//unsigned char image[1024];
-//Paint paint(image, 0, 0);
+void paintConfirmScreen(const char *response, int batteryLevel);
 
-
-
+//Unused in voting_device.ino, could be deleted from this .h file
 void display_question(const char *question, char *line, int *position);
-
-bool check_question(const char *question, char *line, int *position);
-
-bool question_mark(const char *question);
 
 void drawImage(int x, int y, int width, int height, const unsigned char *image);
 
