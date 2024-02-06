@@ -54,6 +54,10 @@ const char* subResync = "/setupVote/Resync";
 #include <encryptionlibrary.h>  //todo find encryption library
 #endif
 
+//Battery
+#define FULL_BATTERY    25
+#define EMPTY_BATTERY   0
+
 #ifdef ISRS_FOR_BUTTONS
 #include "button_interrupts.h"
 void attachISR(void){

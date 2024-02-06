@@ -2,7 +2,6 @@
 #define DISPLAY_H
 #include <SPI.h>
 #include "src/epd1in54_V2.h"
-#include "src/imagedata.h"
 #include "src/epdpaint.h"
 #include <stdio.h>
 

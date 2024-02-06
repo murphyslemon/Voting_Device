@@ -22,6 +22,7 @@ void paintVoteScreen(const char *question, int batteryLevel) { //battery level i
   //battery logo
     paint.Clear(UNCOLORED);
     drawImage(0, 0, 35, 35, batterylogo); // draw the image at (0, 0) coordinates
+    //if you want to add a proper status bar, this is where to do it, (draw rectangle)
     epd.SetFrameMemory(paint.GetImage(), 0, (200-35-3), paint.GetWidth(), paint.GetHeight());
   //battery status bar
     paint.SetWidth(9);

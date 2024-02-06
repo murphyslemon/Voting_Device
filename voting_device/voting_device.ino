@@ -3,6 +3,8 @@
 #include "button_interrupts.h"
 #include "display.h"
 
+//REMEMBER TO REMOVE ALL SERIAL RELATED STUFF AS IT AFFECTS RX PIN.
+
 // MQTT-Client erstellen
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
@@ -13,6 +15,7 @@ bool MQTT_flag = 0;
 // MQTT-Nachrichten verarbeiten
 void callback(char* topic, byte* payload, unsigned int length) {
   //look into what topic is
+  //add specific topic flags here
   memcpy(MQTTmsg, payload, length);
   MQTTmsg[length] = '\0';
   MQTT_flag = 1;
@@ -21,10 +24,10 @@ void callback(char* topic, byte* payload, unsigned int length) {
 //move this function to another folder
 int checkBatteryLevel(){
   int adcValue = analogRead(BATTERY_PIN);
-  float voltage = adcValue * REFERENCE_VOLTAGE / 1023;
-  //int batteryLevel = map(constrain(voltage, 3.0, 9.0), 3.0, 9.0, 0, 100);
-  int batteryLevel = map(voltage, 3.0, 9.0, 0, 100);
-  return batteryLevel;
+  if (adcValue > 440) {
+    return FULL_BATTERY;
+  }
+  return EMPTY_BATTERY;
 }
 
 void setup() {
@@ -33,11 +36,11 @@ void setup() {
   pinMode(BUTTON_PIN_2, INPUT_PULLUP);  // Taster 2 als Eingang mit Pull-up-Widerstand
   pinMode(BUTTON_PIN_3, INPUT_PULLUP);  // Taster 3 als Eingang mit Pull-up-Widerstand
   //LED initialization
-  pinMode(LED_BUILTIN, OUTPUT);
   pinMode(5, OUTPUT);
   digitalWrite(5, HIGH);
-  digitalWrite(LED_BUILTIN, LOW);
-  pinMode(RXPIN, INPUT_PULLUP);
+#ifndef DEBUG
+  pinMode(RXPIN, INPUT_PULLUP); //COMMMENT OUT THIS LINE IF YOU ARE USING SERIAL
+#endif
   //Display initialization
   initDisplay();
 
@@ -89,7 +92,7 @@ Serial.println(macAddress);
 void loop() {
     //powerOff(); // RXPIN dose not work as interrupt, So we put it in main as a function for power off
   int state = 0;
-  int batteryPercentage = 20; //this may need to be global if we diplay screen in setup
+  int batteryPercentage = checkBatteryLevel(); //this may need to be global if we diplay screen in setup
   char response[10] = "";
   char votingID[20] = "";
   char pubTopicVoteResponse[50] = "";
