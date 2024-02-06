@@ -16,6 +16,8 @@ void paintVoteScreen(const char *question, int batteryLevel);
 
 void paintConfirmScreen(const char *response, int batteryLevel);
 
+void paintClosingScreen(const char *question, int batteryLevel);
+
 //Unused in voting_device.ino, could be deleted from this .h file
 void display_question(const char *question, char *line, int *position);
 

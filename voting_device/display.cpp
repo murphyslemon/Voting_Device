@@ -95,6 +95,40 @@ void paintConfirmScreen(const char *response, int batteryLevel) {
     epd.DisplayFrame();
 }
 
+void paintClosingScreen(const char *question, int batteryLevel) { //battery level is a range between 0 and 25, ie. battery at 100% = 25, battery empty=0
+    // this function is under construction and will quite different when complete(6.2.24)
+    paint.SetWidth(30);
+    paint.SetHeight(200);
+    paint.Clear(COLORED); // paints the height and width with the given color
+    paint.DrawStringAt(10, 0, "Are you sure?", &Font20, UNCOLORED); //moves text to co-ordinates with-in the set height and width
+    epd.SetFrameMemory(paint.GetImage(), 0, 0, paint.GetWidth(), paint.GetHeight());
+    paint.Clear(COLORED); // paints the height and width with the given color
+    paint.DrawStringAt(10, 0, "Are you sure?", &Font20, UNCOLORED); //moves text to co-ordinates with-in the set height and width
+    epd.SetFrameMemory(paint.GetImage(), 30, 0, paint.GetWidth(), paint.GetHeight());
+    paint.Clear(COLORED); // paints the height and width with the given color
+    paint.DrawStringAt(10, 0, "Are you sure?", &Font20, UNCOLORED); //moves text to co-ordinates with-in the set height and width
+    epd.SetFrameMemory(paint.GetImage(), 60, 0, paint.GetWidth(), paint.GetHeight());
+    paint.Clear(COLORED); // paints the height and width with the given color
+    paint.DrawStringAt(10, 0, "Are you sure?", &Font20, UNCOLORED); //moves text to co-ordinates with-in the set height and width
+    epd.SetFrameMemory(paint.GetImage(), 90, 0, paint.GetWidth(), paint.GetHeight());
+    paint.Clear(COLORED); // paints the height and width with the given color
+    paint.DrawStringAt(10, 0, "Are you sure?", &Font20, UNCOLORED); //moves text to co-ordinates with-in the set height and width
+    epd.SetFrameMemory(paint.GetImage(), 120, 0, paint.GetWidth(), paint.GetHeight());
+    paint.Clear(COLORED); // paints the height and width with the given color
+    paint.DrawStringAt(10, 0, "Are you sure?", &Font20, UNCOLORED); //moves text to co-ordinates with-in the set height and width
+    epd.SetFrameMemory(paint.GetImage(), 150, 0, paint.GetWidth(), paint.GetHeight());
+    paint.Clear(COLORED); // paints the height and width with the given color
+    paint.DrawStringAt(10, 0, "Are you sure?", &Font20, UNCOLORED); //moves text to co-ordinates with-in the set height and width
+    epd.SetFrameMemory(paint.GetImage(), 180, 0, paint.GetWidth(), paint.GetHeight());
+    
+    epd.DisplayFrame();
+    delay(5000);
+    paint.SetWidth(190);
+    paint.SetHeight(190);
+    paint.Clear(UNCOLORED);
+    epd.SetFrameMemory(paint.GetImage(), 0, 0, paint.GetWidth(), paint.GetHeight());
+    epd.DisplayFrame();
+}
 
 //helper functions
 void drawImage(int x, int y, int width, int height, const unsigned char *image) {

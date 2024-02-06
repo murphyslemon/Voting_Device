@@ -3,22 +3,22 @@
 #include "button_interrupts.h"
 #include "display.h"
 
-int message_count = 0;
-
 // MQTT-Client erstellen
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
 
-char MQTTmsg[] = "This is a test string for payload";
-bool flag = 0;
+char MQTTmsg[255] = "";
+bool MQTT_flag = 0;
 
 // MQTT-Nachrichten verarbeiten
 void callback(char* topic, byte* payload, unsigned int length) {
+  //look into what topic is
   memcpy(MQTTmsg, payload, length);
   MQTTmsg[length] = '\0';
-  flag = 1;
+  MQTT_flag = 1;
 }
 
+//move this function to another folder
 int checkBatteryLevel(){
   int adcValue = analogRead(BATTERY_PIN);
   float voltage = adcValue * REFERENCE_VOLTAGE / 1023;
@@ -40,8 +40,7 @@ void setup() {
   pinMode(RXPIN, INPUT_PULLUP);
   //Display initialization
   initDisplay();
-  char question[100] = "How many characters can E-paper fit across?";
-  char question2[] = "In this example, exampleString is a character array containing the string Hello, World!. The strlen function is then u Hello, World!.";
+
   //attachISR();
 
 #ifdef DEBUG
@@ -85,23 +84,22 @@ Serial.println(macAddress);
     mqttClient.subscribe(subInit.c_str(), MQTTsubQos); //recieve voting ID
     //mqttClient.subscribe(subResync, MQTTsubQos);
     mqttClient.subscribe(subVoteSetup, MQTTsubQos); //recieve question
-    
 }
-
-int state = 0;
-int batteryPercentage = 20;
-char response[10] = "";
-char votingID[20] = "";
-char pubTopicVoteResponse[50] = "";
-char voteTitle[256] = "";
 
 void loop() {
     //powerOff(); // RXPIN dose not work as interrupt, So we put it in main as a function for power off
+  int state = 0;
+  int batteryPercentage = 20; //this may need to be global if we diplay screen in setup
+  char response[10] = "";
+  char votingID[20] = "";
+  char pubTopicVoteResponse[50] = "";
+  char voteTitle[256] = "";
+    
   switch (state) {
     case BOOT:
   //display start up screen
-      if (flag) {
-        flag = 0;
+      if (MQTT_flag) {
+        MQTT_flag = 0;
         strcpy(votingID, MQTTmsg);
         Serial.println(MQTTmsg);
         state = QUESTION; 
@@ -110,8 +108,8 @@ void loop() {
       break;
 
     case QUESTION:
-      if (flag) {
-        flag = 0;
+      if (MQTT_flag) {
+        MQTT_flag = 0;
         Serial.println(MQTTmsg);
         strcpy(voteTitle, MQTTmsg);
         paintVoteScreen(voteTitle, batteryPercentage);
@@ -162,6 +160,5 @@ void loop() {
       state = BOOT;
       break;
   }
-  */
   mqttClient.loop();
 }
