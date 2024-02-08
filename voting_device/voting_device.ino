@@ -1,11 +1,7 @@
 #include "config.h"
 #include "power.h"
 #include "button_interrupts.h"
-//#include "display.h"
-
-#define btn1 0
-#define btn2 2
-#define btn3 12
+#include "display.h"
 
 //REMEMBER TO REMOVE ALL SERIAL RELATED STUFF AS IT AFFECTS RX PIN.
 
@@ -34,46 +30,31 @@ int checkBatteryLevel(){
   return EMPTY_BATTERY;
 }
 
-void ICACHE_RAM_ATTR btnIRQ(){
-  delay(30);
-  if (!digitalRead(btn1)){
-    Serial.println("btn1");
-    while (!digitalRead(btn1));
-  }
-  if (!digitalRead(btn2)){
-    Serial.println("btn2");
-    while (!digitalRead(btn2));
-  }
-  if (!digitalRead(btn3)){
-    Serial.println("btn3");
-    while (!digitalRead(btn3));
-  }
+bool debounce(int pin) {
+  static uint16_t state = 0;
+  state = (state<<1) | digitalRead(pin) | 0xfe00;
+  return (state == 0xff00);
 }
 
 void setup() {
   //button initialization
-  pinMode(btn1, INPUT_PULLUP);
-  pinMode(btn2, INPUT_PULLUP);
-  pinMode(btn3, INPUT_PULLUP);
+  pinMode(BUTTON_PIN_1, INPUT_PULLUP);
+  pinMode(BUTTON_PIN_2, INPUT_PULLUP);
+  pinMode(BUTTON_PIN_3, INPUT_PULLUP);
+#ifdef DEBUG
   Serial.begin(115200);
-  attachInterrupt(digitalPinToInterrupt(btn1), btnIRQ, FALLING);
-  attachInterrupt(digitalPinToInterrupt(btn2), btnIRQ, FALLING);
-  attachInterrupt(digitalPinToInterrupt(btn3), btnIRQ, FALLING);
+#endif
+  //why delay
+  delay(10);
   //LED initialization
   pinMode(5, OUTPUT);
   digitalWrite(5, HIGH);
-#ifndef DEBUG
-  //pinMode(RXPIN, INPUT_PULLUP); //COMMMENT OUT THIS LINE IF YOU ARE USING SERIAL
-#endif
   //Display initialization
-  //initDisplay();
-
-  //attachISR();
-
-#ifdef DEBUG
-  //Serial.begin(115200);
+  initDisplay();
+#ifndef DEBUG
+  pinMode(RXPIN, INPUT_PULLUP); //COMMMENT OUT THIS LINE IF YOU ARE USING SERIAL
 #endif
-  delay(10);
+
 #ifdef DEBUG
   Serial.println("Connecting to WiFi");
 #endif
@@ -96,16 +77,15 @@ void setup() {
     Serial.println("Connecting to the MQTT server");
 #endif
     mqttClient.connect("ESP8266", mqtt_user, mqtt_password);
-    delay(500);
+    delay(500); //why is this here
   }
+  String macAddress = "Mac : " + String(WiFi.macAddress());
 #ifdef DEBUG
   Serial.println("Connection to MQTT server established");
   Serial.println((WiFi.macAddress()).c_str());
   //String rawMacAddress = String(WiFi.macAddress());
-  String macAddress = "Mac : " + String(WiFi.macAddress());
   //String Nadim = "/registration/Server/"+ String(WiFi.macAddress());
-  
-Serial.println(macAddress);
+  Serial.println(macAddress);
 #endif
     mqttClient.publish(pubInit.c_str(), macAddress.c_str());  //send mac address
     mqttClient.subscribe(subInit.c_str(), MQTTsubQos); //recieve voting ID
@@ -113,33 +93,38 @@ Serial.println(macAddress);
     mqttClient.subscribe(subVoteSetup, MQTTsubQos); //recieve question
 }
 
-void loop() {
-    //powerOff(); // RXPIN dose not work as interrupt, So we put it in main as a function for power off
   int state = 0;
   int batteryPercentage = checkBatteryLevel(); //this may need to be global if we diplay screen in setup
   char response[10] = "";
   char votingID[20] = "";
   char pubTopicVoteResponse[50] = "";
   char voteTitle[256] = "";
-    
+
+void loop() {
+#ifndef DEBUG
+    powerOff(); // RXPIN dose not work as interrupt, So we put it in main as a function for power off
+#endif
   switch (state) {
     case BOOT:
   //display start up screen
       if (MQTT_flag) {
         MQTT_flag = 0;
         strcpy(votingID, MQTTmsg);
+#ifdef DEBUG
         Serial.println(MQTTmsg);
+#endif
         state = QUESTION; 
       }
-      //battery status
       break;
 
     case QUESTION:
       if (MQTT_flag) {
         MQTT_flag = 0;
+#ifdef DEBUG
         Serial.println(MQTTmsg);
+#endif
         strcpy(voteTitle, MQTTmsg);
-        //paintVoteScreen(voteTitle, batteryPercentage);
+        paintVoteScreen(voteTitle, batteryPercentage);
         strcat(pubTopicVoteResponse, pubPubVote);
         strcat(pubTopicVoteResponse, votingID);
         state = VOTE;
@@ -147,42 +132,55 @@ void loop() {
       break;
 
     case VOTE:
-      if (!digitalRead(0)) {
+      if (debounce(!BUTTON_PIN_1)) {
         delay(500);
         strcpy(response, "Yes");
-        //paintConfirmScreen(response, batteryPercentage);
+        paintConfirmScreen(response, batteryPercentage);
+#ifdef DEBUG
         Serial.println("YES");
+#endif
         state = CONFIRM;
+        while (!debounce(BUTTON_PIN_1));
       }
-      else if (digitalRead(2)) {
+      else if (!debounce(BUTTON_PIN_2)) {
         strcpy(response, "Pass");
-        //paintConfirmScreen(response, batteryPercentage);
+        paintConfirmScreen(response, batteryPercentage);
+#ifdef DEBUG
         Serial.println("PASS");
+#endif
         state = CONFIRM;
+        while (!debounce(BUTTON_PIN_2));
       }
-      else if (digitalRead(12)) {
+      else if (debounce(BUTTON_PIN_3)) {
         strcpy(response, "No");
-        //paintConfirmScreen(response, batteryPercentage);
+        paintConfirmScreen(response, batteryPercentage);
+#ifdef DEBUG
         Serial.println("NO");
+#endif
         state = CONFIRM;
+        while (debounce(BUTTON_PIN_1));
       }
       break;
 
     case CONFIRM:
-      if (digitalRead(0)) {
+      if (!debounce(BUTTON_PIN_1)) {
         delay(500);
         mqttClient.publish(pubPubVote, response);
         state = CLOSE_VOTE;
+        while (!debounce(BUTTON_PIN_1));
       }
-      else if (!digitalRead(12)){
-        //paintVoteScreen(voteTitle, batteryPercentage);
+      else if (!debounce(BUTTON_PIN_3)){
+        paintVoteScreen(voteTitle, batteryPercentage);
         state = VOTE;
+        while (!debounce(BUTTON_PIN_3));
       }
       break;
 
     case CLOSE_VOTE:
       //display closing thank you
+#ifdef DEBUG
       Serial.println("voting ending");
+#endif
       delay(2000);
       state = BOOT;
       break;
