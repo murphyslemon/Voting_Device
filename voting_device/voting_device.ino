@@ -1,7 +1,11 @@
 #include "config.h"
 #include "power.h"
 #include "button_interrupts.h"
-#include "display.h"
+//#include "display.h"
+
+#define btn1 0
+#define btn2 2
+#define btn3 12
 
 //REMEMBER TO REMOVE ALL SERIAL RELATED STUFF AS IT AFFECTS RX PIN.
 
@@ -30,24 +34,44 @@ int checkBatteryLevel(){
   return EMPTY_BATTERY;
 }
 
+void ICACHE_RAM_ATTR btnIRQ(){
+  delay(30);
+  if (!digitalRead(btn1)){
+    Serial.println("btn1");
+    while (!digitalRead(btn1));
+  }
+  if (!digitalRead(btn2)){
+    Serial.println("btn2");
+    while (!digitalRead(btn2));
+  }
+  if (!digitalRead(btn3)){
+    Serial.println("btn3");
+    while (!digitalRead(btn3));
+  }
+}
+
 void setup() {
   //button initialization
-  pinMode(BUTTON_PIN_1, INPUT_PULLUP);  // Taster 1 als Eingang mit Pull-up-Widerstand
-  pinMode(BUTTON_PIN_2, INPUT_PULLUP);  // Taster 2 als Eingang mit Pull-up-Widerstand
-  pinMode(BUTTON_PIN_3, INPUT_PULLUP);  // Taster 3 als Eingang mit Pull-up-Widerstand
+  pinMode(btn1, INPUT_PULLUP);
+  pinMode(btn2, INPUT_PULLUP);
+  pinMode(btn3, INPUT_PULLUP);
+  Serial.begin(115200);
+  attachInterrupt(digitalPinToInterrupt(btn1), btnIRQ, FALLING);
+  attachInterrupt(digitalPinToInterrupt(btn2), btnIRQ, FALLING);
+  attachInterrupt(digitalPinToInterrupt(btn3), btnIRQ, FALLING);
   //LED initialization
   pinMode(5, OUTPUT);
   digitalWrite(5, HIGH);
 #ifndef DEBUG
-  pinMode(RXPIN, INPUT_PULLUP); //COMMMENT OUT THIS LINE IF YOU ARE USING SERIAL
+  //pinMode(RXPIN, INPUT_PULLUP); //COMMMENT OUT THIS LINE IF YOU ARE USING SERIAL
 #endif
   //Display initialization
-  initDisplay();
+  //initDisplay();
 
   //attachISR();
 
 #ifdef DEBUG
-  Serial.begin(115200);
+  //Serial.begin(115200);
 #endif
   delay(10);
 #ifdef DEBUG
@@ -115,7 +139,7 @@ void loop() {
         MQTT_flag = 0;
         Serial.println(MQTTmsg);
         strcpy(voteTitle, MQTTmsg);
-        paintVoteScreen(voteTitle, batteryPercentage);
+        //paintVoteScreen(voteTitle, batteryPercentage);
         strcat(pubTopicVoteResponse, pubPubVote);
         strcat(pubTopicVoteResponse, votingID);
         state = VOTE;
@@ -123,35 +147,35 @@ void loop() {
       break;
 
     case VOTE:
-      if (!digitalRead(12)) {
+      if (!digitalRead(0)) {
         delay(500);
         strcpy(response, "Yes");
-        paintConfirmScreen(response, batteryPercentage);
+        //paintConfirmScreen(response, batteryPercentage);
         Serial.println("YES");
         state = CONFIRM;
       }
       else if (digitalRead(2)) {
         strcpy(response, "Pass");
-        paintConfirmScreen(response, batteryPercentage);
+        //paintConfirmScreen(response, batteryPercentage);
         Serial.println("PASS");
         state = CONFIRM;
       }
       else if (digitalRead(12)) {
         strcpy(response, "No");
-        paintConfirmScreen(response, batteryPercentage);
+        //paintConfirmScreen(response, batteryPercentage);
         Serial.println("NO");
         state = CONFIRM;
       }
       break;
 
     case CONFIRM:
-      if (digitalRead(12)) {
+      if (digitalRead(0)) {
         delay(500);
         mqttClient.publish(pubPubVote, response);
         state = CLOSE_VOTE;
       }
-      else if (!digitalRead(0)){
-        paintVoteScreen(voteTitle, batteryPercentage);
+      else if (!digitalRead(12)){
+        //paintVoteScreen(voteTitle, batteryPercentage);
         state = VOTE;
       }
       break;
