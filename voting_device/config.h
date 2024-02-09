@@ -3,6 +3,8 @@
 #include <PubSubClient.h> //Mqtt library by Nick O'Leary
 #include <string.h>
 //#include <Wifi.h>
+
+#define STRINGSIZE 256
 #define BATTERY_PIN A0
 #define REFERENCE_VOLTAGE 3.3
 
@@ -21,9 +23,10 @@
 #define CONFIRM     3
 #define CLOSE_VOTE  4
 
+
 // WLAN-Settings
-const char* ssid = "franks_galaxy";
-const char* password = "veef2267";
+const char* ssid = "Nadim";
+const char* password = "nadimahmed";
 
 // MQTT-Server Settings
 const char* mqtt_server = "194.110.231.227";
@@ -38,7 +41,7 @@ const String pubInit = "/registration/Server/"+ String(WiFi.macAddress());
 const char* pubPubVote = "/vote/";
 
 // MQTT topics to subscribe
-const String subInit = "/registration/esp/"+ String(WiFi.macAddress());
+const String subInit = "/registration/esp/"+ String(WiFi.macAddress()); // /registration/esp/
 const char* subVoteSetup = "/setupVote/Setup";
 const char* subResync = "/setupVote/Resync";
 
@@ -47,7 +50,7 @@ const char* subResync = "/setupVote/Resync";
 #define STATUS_LEDS
 //#define E_PAPER
 #define DEBUG
-#define ISRS_FOR_BUTTONS
+
 
 //Includes according to config
 #ifdef ENCRYPTION
@@ -58,12 +61,3 @@ const char* subResync = "/setupVote/Resync";
 #define FULL_BATTERY    25
 #define EMPTY_BATTERY   0
 
-#ifdef ISRS_FOR_BUTTONS
-#include "button_interrupts.h"
-void attachISR(void){
-  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_1), Isr_Btn_1, FALLING);
-  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_2), Isr_Btn_2, FALLING);
-  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_3), Isr_Btn_3, FALLING);
-
-}
-#endif
