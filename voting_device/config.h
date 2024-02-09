@@ -47,10 +47,6 @@ const char* subResync = "/setupVote/Resync";
 
 //configuration of functionality
 //#define ENCRYPTION
-#define STATUS_LEDS
-//#define E_PAPER
-#define DEBUG
-
 
 //Includes according to config
 #ifdef ENCRYPTION

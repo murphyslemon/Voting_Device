@@ -67,7 +67,6 @@ int checkBatteryLevel(){
   }
   return EMPTY_BATTERY;
 }
-
 void connectToWiFi() {
   Serial.print("Connecting to WiFi");
   while (WiFi.status() != WL_CONNECTED) {
@@ -85,6 +84,11 @@ void connectToMQTT() {
     delay(500);
   }
   Serial.println("Connection to MQTT server established");
+}
+bool debounce(int pin) {
+  static uint16_t state = 0;
+  state = (state<<1) | digitalRead(pin) | 0xfe00;
+  return (state == 0xff00);
 }
 
 void setup() {
@@ -104,21 +108,20 @@ void setup() {
   //initDisplay();
 
   //attachISR();
+
   WiFi.begin(ssid, password);
   connectToWiFi();
   mqttClient.setServer(mqtt_server, mqtt_port);
   mqttClient.setCallback(callback);
   connectToMQTT();
-  Serial.println("Connection to MQTT server established");
+
   String macAddress = "{\"Mac\" : \"" + String(WiFi.macAddress()) + "\"}";
-  
   Serial.println(macAddress);
   mqttClient.publish(pubInit.c_str(), macAddress.c_str());  //send mac address
   mqttClient.subscribe(subInit.c_str(), MQTTsubQos); //recieve voting ID
   Serial.println("#" + String(subInit.c_str()) + "#") ;
   //mqttClient.subscribe(subResync, MQTTsubQos);
   mqttClient.subscribe(subVoteSetup, MQTTsubQos); //recieve question
-  // mqttClient.subscribe("/registration/esp/C8:C9:A3:1B:ED:5F", MQTTsubQos);
 }
 
   int state = 0;
@@ -128,7 +131,6 @@ void setup() {
   char pubTopicVoteResponse[STRINGSIZE] = "";
   char voteTitle[STRINGSIZE] = "";
    
-
 void loop() {
   switch (state) {
     case BOOT:
@@ -139,7 +141,6 @@ void loop() {
         Serial.println(votingID);
         state = QUESTION; 
       }
-      //battery status
       break;
 
     case QUESTION:
@@ -155,25 +156,27 @@ void loop() {
       break;
 
     case VOTE:
-
       if (!digitalRead(0)) {
         delay(500);
         strcpy(response, "Yes");
         //paintConfirmScreen(response, batteryPercentage);
         Serial.println("YES");
         state = CONFIRM;
+        while (!debounce(BUTTON_PIN_1));
       }
       else if (!digitalRead(2)) {
         strcpy(response, "Pass");
         //paintConfirmScreen(response, batteryPercentage);
         Serial.println("PASS");
         state = CONFIRM;
+        while (!debounce(BUTTON_PIN_2));
       }
       else if (!digitalRead(12)) {
         strcpy(response, "No");
         //paintConfirmScreen(response, batteryPercentage);
         Serial.println("NO");
         state = CONFIRM;
+        while (debounce(BUTTON_PIN_1));
       }
       break;
 
@@ -182,16 +185,16 @@ void loop() {
         delay(500);
         mqttClient.publish(pubPubVote, response);
         state = CLOSE_VOTE;
+        while (!debounce(BUTTON_PIN_1));
       }
       else if (!digitalRead(12)){
         //paintVoteScreen(voteTitle, batteryPercentage);
         state = VOTE;
+        while (!debounce(BUTTON_PIN_3));
       }
       break;
 
     case CLOSE_VOTE:
-      //display closing thank you
-      Serial.println("voting ending");
       delay(2000);
       state = BOOT;
       break;
