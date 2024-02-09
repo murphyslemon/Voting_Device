@@ -158,13 +158,17 @@ void loop() {
     case VOTE:
       if (!digitalRead(0)) {
         delay(500);
-        strcpy(response, "Yes");
+        char responseBuffer[STRINGSIZE];
+        snprintf(responseBuffer, sizeof(responseBuffer), "{\"vote\":\"Yes\", \"votingTitle\":\"%s\"}", MQTTVotingTitle);
+        strcpy(response, responseBuffer);
         //paintConfirmScreen(response, batteryPercentage);
         Serial.println("YES");
         state = CONFIRM;
-        while (!debounce(BUTTON_PIN_1));
+      
       }
+      /*
       else if (!digitalRead(2)) {
+        delay(500);
         strcpy(response, "Pass");
         //paintConfirmScreen(response, batteryPercentage);
         Serial.println("PASS");
@@ -172,12 +176,14 @@ void loop() {
         while (!debounce(BUTTON_PIN_2));
       }
       else if (!digitalRead(12)) {
+        delay(500);
         strcpy(response, "No");
         //paintConfirmScreen(response, batteryPercentage);
         Serial.println("NO");
         state = CONFIRM;
-        while (debounce(BUTTON_PIN_1));
+        while (debounce(BUTTON_PIN_3));
       }
+      */
       break;
 
     case CONFIRM:
@@ -185,13 +191,14 @@ void loop() {
         delay(500);
         mqttClient.publish(pubPubVote, response);
         state = CLOSE_VOTE;
-        while (!debounce(BUTTON_PIN_1));
       }
+      /*
       else if (!digitalRead(12)){
         //paintVoteScreen(voteTitle, batteryPercentage);
         state = VOTE;
         while (!debounce(BUTTON_PIN_3));
       }
+      */
       break;
 
     case CLOSE_VOTE:
