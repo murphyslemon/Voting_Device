@@ -47,7 +47,7 @@ const char* subResync = "/setupVote/Resync";
 #define STATUS_LEDS
 //#define E_PAPER
 #define DEBUG
-#define ISRS_FOR_BUTTONS
+//#define ISRS_FOR_BUTTONS
 
 //Includes according to config
 #ifdef ENCRYPTION
