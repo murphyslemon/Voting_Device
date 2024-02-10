@@ -4,7 +4,9 @@
 #include "button_interrupts.h"
 #include <ArduinoJson.h>
 
-//REMEMBER TO REMOVE ALL SERIAL RELATED STUFF AS IT AFFECTS RX PIN.
+//#################################################################################################
+//### REMEMBER TO COMMENT OUT: Serial.begin(115200); FROM SETUP FUNCTION, AS IT AFFECTS RX PIN. ###
+//#################################################################################################
 
 // MQTT-Client erstellen
 WiFiClient wifiClient;
@@ -85,11 +87,13 @@ bool debounce(int pin) {
 }
 
 void setup() {
-  Serial.begin(115200);
+  //Serial.begin(115200);
   //button initialization
   pinMode(BUTTON_PIN_1, INPUT_PULLUP);  // Taster 1 als Eingang mit Pull-up-Widerstand
   pinMode(BUTTON_PIN_2, INPUT_PULLUP);  // Taster 2 als Eingang mit Pull-up-Widerstand
-  //pinMode(BUTTON_PIN_3, INPUT_PULLUP);  // Taster 3 als Eingang mit Pull-up-Widerstand
+  pinMode(PWR_PIN, OUTPUT);
+  pinMode(RX_PIN, INPUT_PULLUP);
+  digitalWrite(PWR_PIN, HIGH); //power on device
   
   /*
   //LED initialization
@@ -121,8 +125,7 @@ void setup() {
 }
 
   int state = 0;
-  //int batteryPercentage = checkBatteryLevel(); //this may need to be global if we diplay screen in setup
-  int batteryPercentage = 20;
+  int batteryPercentage = checkBatteryLevel(); //this may need to be global if we diplay screen in setup
   char response[STRINGSIZE] = "";
   char votingID[STRINGSIZE] = "";
   char pubTopicVoteResponse[STRINGSIZE] = "";
@@ -130,7 +133,7 @@ void setup() {
   char responseBuffer[STRINGSIZE];
   
 void loop() {
-  //powerOff();
+  powerOff();
   switch (state) {
     case BOOT:
   //display start up screen
@@ -155,47 +158,70 @@ void loop() {
       break;
 
     case VOTE:
-      if (!digitalRead(0)) {
-        delay(500);
-        Serial.println("I am in Button1: Vote");
-        snprintf(responseBuffer, sizeof(responseBuffer), "{\"vote\":\"Yes\", \"votingTitle\":\"%s\"}", MQTTVotingTitle);
-        strcpy(response, responseBuffer);
-        paintConfirmScreen("YES", batteryPercentage);
-        Serial.println("YES");
-        state = CONFIRM;
-      
+      if (!digitalRead(BUTTON_PIN_1)) {
+        delay(30);
+        if (!digitalRead(BUTTON_PIN_1)){
+          Serial.println("I am in Button1: Vote");
+          snprintf(responseBuffer, sizeof(responseBuffer), "{\"vote\":\"Yes\", \"votingTitle\":\"%s\"}", MQTTVotingTitle);
+          strcpy(response, responseBuffer);
+          paintConfirmScreen("YES", batteryPercentage);
+          Serial.println("YES");
+          state = CONFIRM;
+          while (!digitalRead(BUTTON_PIN_1)){
+            delay(100);
+          }
+        }      
       }
-      else if (!digitalRead(2)) {
-        delay(500);
-        snprintf(responseBuffer, sizeof(responseBuffer), "{\"vote\":\"Abstain\", \"votingTitle\":\"%s\"}", MQTTVotingTitle);
-        strcpy(response, responseBuffer);
-        paintConfirmScreen("ABSTAIN", batteryPercentage);
-        Serial.println("PASS");
-        state = CONFIRM;
-
+      else if (!digitalRead(BUTTON_PIN_2)) {
+        delay(30);
+        if (!digitalRead(BUTTON_PIN_2)){
+          snprintf(responseBuffer, sizeof(responseBuffer), "{\"vote\":\"Abstain\", \"votingTitle\":\"%s\"}", MQTTVotingTitle);
+          strcpy(response, responseBuffer);
+          paintConfirmScreen("ABSTAIN", batteryPercentage);
+          Serial.println("PASS");
+          state = CONFIRM;
+          while (!digitalRead(BUTTON_PIN_2)){
+            delay(100);
+          }
+        }
       }
-      else if (!digitalRead(12)) {
-        delay(500);
-         snprintf(responseBuffer, sizeof(responseBuffer), "{\"vote\":\"No\", \"votingTitle\":\"%s\"}", MQTTVotingTitle);
-        strcpy(response, responseBuffer);
-        paintConfirmScreen("NO", batteryPercentage);
-        Serial.println("NO");
-        state = CONFIRM;
+      else if (!digitalRead(BUTTON_PIN_3)) {
+        delay(30);
+        if (!digitalRead(BUTTON_PIN_3)){
+          snprintf(responseBuffer, sizeof(responseBuffer), "{\"vote\":\"No\", \"votingTitle\":\"%s\"}", MQTTVotingTitle);
+          strcpy(response, responseBuffer);
+          paintConfirmScreen("NO", batteryPercentage);
+          Serial.println("NO");
+          state = CONFIRM;
+          while (!digitalRead(BUTTON_PIN_3)){
+            delay(100);
+          }
+        }
       }
       break;
 
     case CONFIRM:
     // ButtonYes.getState()
-      if (!digitalRead(0)) {
-        delay(500);
-        Serial.println("I am in Button1: Confirm");
-        mqttClient.publish(pubPubVote, response);
-        state = CLOSE_VOTE;
+      if (!digitalRead(BUTTON_PIN_1)) {
+        delay(30);
+        if (!digitalRead(BUTTON_PIN_1)){
+          Serial.println("I am in Button1: Confirm");
+          mqttClient.publish(pubPubVote, response);
+          state = CLOSE_VOTE;
+          while (!digitalRead(BUTTON_PIN_1)){
+            delay(100);
+          }
+        }
       }
-      else if (!digitalRead(12)){
-        delay(500);
-        paintVoteScreen(voteTitle, batteryPercentage);
-        state = VOTE;
+      else if (!digitalRead(BUTTON_PIN_3)) {
+        delay(30);
+        if (!digitalRead(BUTTON_PIN_3)){
+          paintVoteScreen(voteTitle, batteryPercentage);
+          state = VOTE;
+          while (!digitalRead(BUTTON_PIN_3)){
+            delay(100);
+          }
+        }
       }
       break;
 

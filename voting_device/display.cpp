@@ -99,8 +99,8 @@ void paintClosingScreen() {
     paint.Clear(UNCOLORED); // paints the height and width with the given color
     epd.SetFrameMemory(paint.GetImage(), 60, 0, paint.GetWidth(), paint.GetHeight());
     paint.Clear(UNCOLORED); // paints the height and width with the given color
-    paint.DrawStringAt(25, 0, "THANK YOU!!", &Font24, COLORED); //moves text to co-ordinates with-in the set height and width
-    paint.DrawStringAt(26, 0, "THANK YOU!!", &Font24, COLORED);
+    paint.DrawStringAt(12, 0, "THANK YOU!!", &Font24, COLORED); //moves text to co-ordinates with-in the set height and width
+    paint.DrawStringAt(13, 0, "THANK YOU!!", &Font24, COLORED);
     epd.SetFrameMemory(paint.GetImage(), 90, 0, paint.GetWidth(), paint.GetHeight());
     paint.Clear(UNCOLORED); // paints the height and width with the given color
     epd.SetFrameMemory(paint.GetImage(), 120, 0, paint.GetWidth(), paint.GetHeight());

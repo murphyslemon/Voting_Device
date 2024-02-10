@@ -54,7 +54,7 @@ const char* subResync = "/setupVote/Resync";
 #endif
 
 //Battery
-#define FULL_BATTERY    25
+#define FULL_BATTERY    28
 #define EMPTY_BATTERY   0
 
 //#ifdef ISRS_FOR_BUTTONS
