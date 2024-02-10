@@ -22,13 +22,9 @@ void paintVoteScreen(const char *question, int batteryLevel) { //battery level i
   //battery logo
     paint.Clear(UNCOLORED);
     drawImage(0, 0, 35, 35, batterylogo); // draw the image at (0, 0) coordinates
-    //if you want to add a proper status bar, this is where to do it, (draw rectangle)
-    epd.SetFrameMemory(paint.GetImage(), 0, (200-35-3), paint.GetWidth(), paint.GetHeight());
   //battery status bar
-    paint.SetWidth(9);
-    paint.SetHeight(batteryLevel);
-    paint.Clear(COLORED);
-    epd.SetFrameMemory(paint.GetImage(), 15, (200-(batteryLevel + 5)), paint.GetWidth(), paint.GetHeight()); //x value 10-15 good (16 too far)
+    paint.DrawFilledRectangle(4, 8, batteryLevel, 24, COLORED);
+    epd.SetFrameMemory(paint.GetImage(), 0, (200-35-3), paint.GetWidth(), paint.GetHeight());
   //Bottom buttton bar
     paint.SetWidth(22);
     paint.SetHeight(200);
@@ -46,10 +42,10 @@ void paintVoteScreen(const char *question, int batteryLevel) { //battery level i
       display_question(question, line, &position);
     }
     else {
-    char stringMod[90]; // Including space for null terminator
-    strncpy(stringMod, question, 90);
-    stringMod[89] = '\0';
-    display_question(stringMod, line, &position); // Pass the modified string to display_question
+      char stringMod[90]; // Including space for null terminator
+      strncpy(stringMod, question, 90);
+      stringMod[89] = '\0';
+      display_question(stringMod, line, &position); // Pass the modified string to display_question
     }
     epd.DisplayFrame();
 }
@@ -64,12 +60,9 @@ void paintConfirmScreen(const char *response, int batteryLevel) {
   //battery logo
     paint.Clear(UNCOLORED);
     drawImage(0, 0, 35, 35, batterylogo); // draw the image at (0, 0) coordinates
-    epd.SetFrameMemory(paint.GetImage(), 0, (200-35-3), paint.GetWidth(), paint.GetHeight());
   //battery status bar
-    paint.SetWidth(9);
-    paint.SetHeight(batteryLevel);
-    paint.Clear(COLORED);
-    epd.SetFrameMemory(paint.GetImage(), 15, (200-(batteryLevel + 5)), paint.GetWidth(), paint.GetHeight()); //x value 10-15 good (16 too far)
+    paint.DrawFilledRectangle(4, 8, batteryLevel, 24, COLORED);
+    epd.SetFrameMemory(paint.GetImage(), 0, (200-35-3), paint.GetWidth(), paint.GetHeight());
   //Bottom button bar
     paint.SetWidth(22);
     paint.SetHeight(200);
@@ -96,38 +89,25 @@ void paintConfirmScreen(const char *response, int batteryLevel) {
     epd.DisplayFrame();
 }
 
-void paintClosingScreen(const char *question, int batteryLevel) { //battery level is a range between 0 and 25, ie. battery at 100% = 25, battery empty=0
-    // this function is under construction and will quite different when complete(6.2.24)
+void paintClosingScreen() {
     paint.SetWidth(30);
     paint.SetHeight(200);
-    paint.Clear(COLORED); // paints the height and width with the given color
-    paint.DrawStringAt(10, 0, "Are you sure?", &Font20, UNCOLORED); //moves text to co-ordinates with-in the set height and width
+    paint.Clear(UNCOLORED); // paints the height and width with the given color
     epd.SetFrameMemory(paint.GetImage(), 0, 0, paint.GetWidth(), paint.GetHeight());
-    paint.Clear(COLORED); // paints the height and width with the given color
-    paint.DrawStringAt(10, 0, "Are you sure?", &Font20, UNCOLORED); //moves text to co-ordinates with-in the set height and width
+    paint.Clear(UNCOLORED); // paints the height and width with the given color
     epd.SetFrameMemory(paint.GetImage(), 30, 0, paint.GetWidth(), paint.GetHeight());
-    paint.Clear(COLORED); // paints the height and width with the given color
-    paint.DrawStringAt(10, 0, "Are you sure?", &Font20, UNCOLORED); //moves text to co-ordinates with-in the set height and width
+    paint.Clear(UNCOLORED); // paints the height and width with the given color
     epd.SetFrameMemory(paint.GetImage(), 60, 0, paint.GetWidth(), paint.GetHeight());
-    paint.Clear(COLORED); // paints the height and width with the given color
-    paint.DrawStringAt(10, 0, "Are you sure?", &Font20, UNCOLORED); //moves text to co-ordinates with-in the set height and width
+    paint.Clear(UNCOLORED); // paints the height and width with the given color
+    paint.DrawStringAt(25, 0, "THANK YOU!!", &Font24, COLORED); //moves text to co-ordinates with-in the set height and width
+    paint.DrawStringAt(26, 0, "THANK YOU!!", &Font24, COLORED);
     epd.SetFrameMemory(paint.GetImage(), 90, 0, paint.GetWidth(), paint.GetHeight());
-    paint.Clear(COLORED); // paints the height and width with the given color
-    paint.DrawStringAt(10, 0, "Are you sure?", &Font20, UNCOLORED); //moves text to co-ordinates with-in the set height and width
+    paint.Clear(UNCOLORED); // paints the height and width with the given color
     epd.SetFrameMemory(paint.GetImage(), 120, 0, paint.GetWidth(), paint.GetHeight());
-    paint.Clear(COLORED); // paints the height and width with the given color
-    paint.DrawStringAt(10, 0, "Are you sure?", &Font20, UNCOLORED); //moves text to co-ordinates with-in the set height and width
+    paint.Clear(UNCOLORED); // paints the height and width with the given color
     epd.SetFrameMemory(paint.GetImage(), 150, 0, paint.GetWidth(), paint.GetHeight());
-    paint.Clear(COLORED); // paints the height and width with the given color
-    paint.DrawStringAt(10, 0, "Are you sure?", &Font20, UNCOLORED); //moves text to co-ordinates with-in the set height and width
+    paint.Clear(UNCOLORED); // paints the height and width with the given color
     epd.SetFrameMemory(paint.GetImage(), 180, 0, paint.GetWidth(), paint.GetHeight());
-    
-    epd.DisplayFrame();
-    delay(5000);
-    paint.SetWidth(190);
-    paint.SetHeight(190);
-    paint.Clear(UNCOLORED);
-    epd.SetFrameMemory(paint.GetImage(), 0, 0, paint.GetWidth(), paint.GetHeight());
     epd.DisplayFrame();
 }
 

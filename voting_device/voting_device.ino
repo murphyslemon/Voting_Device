@@ -121,12 +121,14 @@ void setup() {
 }
 
   int state = 0;
-  int batteryPercentage = checkBatteryLevel(); //this may need to be global if we diplay screen in setup
+  //int batteryPercentage = checkBatteryLevel(); //this may need to be global if we diplay screen in setup
+  int batteryPercentage = 20;
   char response[STRINGSIZE] = "";
   char votingID[STRINGSIZE] = "";
   char pubTopicVoteResponse[STRINGSIZE] = "";
   char voteTitle[STRINGSIZE] = "";
   char responseBuffer[STRINGSIZE];
+  
 void loop() {
   //powerOff();
   switch (state) {
@@ -199,7 +201,7 @@ void loop() {
 
     case CLOSE_VOTE:
       delay(2000);
-      paintVoteScreen("Wating...for new question. ", batteryPercentage);
+      paintClosingScreen();
       state = QUESTION;
       break;
   }
