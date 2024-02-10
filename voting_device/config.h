@@ -57,3 +57,12 @@ const char* subResync = "/setupVote/Resync";
 #define FULL_BATTERY    25
 #define EMPTY_BATTERY   0
 
+//#ifdef ISRS_FOR_BUTTONS
+#include "button_interrupts.h"
+void attachISR(void){
+  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_1), Isr_Btn_1, FALLING);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_2), Isr_Btn_2, FALLING);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN_3), Isr_Btn_3, FALLING);
+}
+//#endif
+

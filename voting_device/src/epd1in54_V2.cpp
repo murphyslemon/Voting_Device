@@ -88,7 +88,6 @@ Epd::Epd()
 	reset_pin = RST_PIN;
 	dc_pin = DC_PIN;
 	cs_pin = CS_PIN;
-	busy_pin = BUSY_PIN;
 	width = EPD_WIDTH;
 	height = EPD_HEIGHT;
 };
@@ -116,9 +115,6 @@ void Epd::SendData(unsigned char data)
  */
 void Epd::WaitUntilIdle(void)
 {
-	while(DigitalRead(busy_pin) == 1) {      //LOW: idle, HIGH: busy
-		DelayMs(100);
-	}
 	DelayMs(200);
 }
 

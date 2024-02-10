@@ -1,6 +1,7 @@
 #include "config.h"
 #include "power.h"
 #include "display.h"
+#include "button_interrupts.h"
 #include <ArduinoJson.h>
 
 //REMEMBER TO REMOVE ALL SERIAL RELATED STUFF AS IT AFFECTS RX PIN.
@@ -50,14 +51,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.println(error.c_str());
   }
 }
-/*
-// MQTT Callback Function
-void callback(char* topic, byte* payload, unsigned int length) {
-  memcpy(MQTTmsg, payload, length);
-  MQTTmsg[length] = '\0';
-  MQTT_flag = 1;
-}
-*/
 
 //move this function to another folder
 int checkBatteryLevel(){
@@ -92,20 +85,23 @@ bool debounce(int pin) {
 }
 
 void setup() {
-
   Serial.begin(115200);
   //button initialization
   pinMode(BUTTON_PIN_1, INPUT_PULLUP);  // Taster 1 als Eingang mit Pull-up-Widerstand
   pinMode(BUTTON_PIN_2, INPUT_PULLUP);  // Taster 2 als Eingang mit Pull-up-Widerstand
-  pinMode(BUTTON_PIN_3, INPUT_PULLUP);  // Taster 3 als Eingang mit Pull-up-Widerstand
+  //pinMode(BUTTON_PIN_3, INPUT_PULLUP);  // Taster 3 als Eingang mit Pull-up-Widerstand
   
+  /*
   //LED initialization
+  pinMode(LED_BUILTIN, OUTPUT);
   pinMode(5, OUTPUT);
   digitalWrite(5, HIGH);
-  //pinMode(RXPIN, INPUT_PULLUP); //COMMMENT OUT THIS LINE IF YOU ARE USING SERIAL
-
+  digitalWrite(LED_BUILTIN, HIGH);
+  pinMode(RXPIN, INPUT_PULLUP); //COMMMENT OUT THIS LINE IF YOU ARE USING SERIAL
+  */
+  
   //Display initialization
-  //initDisplay();
+  initDisplay();
 
   //attachISR();
 
@@ -130,8 +126,9 @@ void setup() {
   char votingID[STRINGSIZE] = "";
   char pubTopicVoteResponse[STRINGSIZE] = "";
   char voteTitle[STRINGSIZE] = "";
-   
+  char responseBuffer[STRINGSIZE];
 void loop() {
+  //powerOff();
   switch (state) {
     case BOOT:
   //display start up screen
@@ -148,7 +145,7 @@ void loop() {
         MQTT_flag = 0;
         strcpy(voteTitle, MQTTVotingTitle);
         Serial.println(voteTitle);
-        //paintVoteScreen(voteTitle, batteryPercentage);
+        paintVoteScreen(voteTitle, batteryPercentage);
         strcat(pubTopicVoteResponse, pubPubVote);
         strcat(pubTopicVoteResponse, votingID);
         state = VOTE;
@@ -158,52 +155,52 @@ void loop() {
     case VOTE:
       if (!digitalRead(0)) {
         delay(500);
-        char responseBuffer[STRINGSIZE];
+        Serial.println("I am in Button1: Vote");
         snprintf(responseBuffer, sizeof(responseBuffer), "{\"vote\":\"Yes\", \"votingTitle\":\"%s\"}", MQTTVotingTitle);
         strcpy(response, responseBuffer);
-        //paintConfirmScreen(response, batteryPercentage);
+        paintConfirmScreen("YES", batteryPercentage);
         Serial.println("YES");
         state = CONFIRM;
       
       }
-      /*
       else if (!digitalRead(2)) {
         delay(500);
-        strcpy(response, "Pass");
-        //paintConfirmScreen(response, batteryPercentage);
+        snprintf(responseBuffer, sizeof(responseBuffer), "{\"vote\":\"Abstain\", \"votingTitle\":\"%s\"}", MQTTVotingTitle);
+        strcpy(response, responseBuffer);
+        paintConfirmScreen("ABSTAIN", batteryPercentage);
         Serial.println("PASS");
         state = CONFIRM;
-        while (!debounce(BUTTON_PIN_2));
+
       }
       else if (!digitalRead(12)) {
         delay(500);
-        strcpy(response, "No");
-        //paintConfirmScreen(response, batteryPercentage);
+         snprintf(responseBuffer, sizeof(responseBuffer), "{\"vote\":\"No\", \"votingTitle\":\"%s\"}", MQTTVotingTitle);
+        strcpy(response, responseBuffer);
+        paintConfirmScreen("NO", batteryPercentage);
         Serial.println("NO");
         state = CONFIRM;
-        while (debounce(BUTTON_PIN_3));
       }
-      */
       break;
 
     case CONFIRM:
+    // ButtonYes.getState()
       if (!digitalRead(0)) {
         delay(500);
+        Serial.println("I am in Button1: Confirm");
         mqttClient.publish(pubPubVote, response);
         state = CLOSE_VOTE;
       }
-      /*
       else if (!digitalRead(12)){
-        //paintVoteScreen(voteTitle, batteryPercentage);
+        delay(500);
+        paintVoteScreen(voteTitle, batteryPercentage);
         state = VOTE;
-        while (!debounce(BUTTON_PIN_3));
       }
-      */
       break;
 
     case CLOSE_VOTE:
       delay(2000);
-      state = BOOT;
+      paintVoteScreen("Wating...for new question. ", batteryPercentage);
+      state = QUESTION;
       break;
   }
 
