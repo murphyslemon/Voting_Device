@@ -51,7 +51,7 @@ static void clearQuestionArea(){
   epd.SetFrameMemory(paint.GetImage(), offset, 0, paint.GetWidth(), paint.GetHeight());
 }
 
-void paintVoteScreen(const char *question) { //battery level is a range between 0 and 25, ie. battery at 100% = 25, battery empty=0
+void paintVoteScreen(const char *question) { //battery level is a range between 4 and 28, ie. battery at 100% = 28, battery empty=4
   //clear screen
     clearQuestionArea();
     //Bottom buttton bar

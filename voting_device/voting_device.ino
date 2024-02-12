@@ -75,7 +75,7 @@ void connectToWiFi() {
 void connectToMQTT() {
   while (!mqttClient.connected()) {
     Serial.println("Connecting to the MQTT server");
-    mqttClient.connect("ESP8266", mqtt_user, mqtt_password);
+    mqttClient.connect(WiFi.macAddress().c_str(), mqtt_user, mqtt_password);
     delay(500);
   }
   Serial.println("Connection to MQTT server established");
@@ -84,7 +84,7 @@ void connectToMQTT() {
 int batteryPercentage = checkBatteryLevel();
 
 void setup() {
-  Serial.begin(115200);
+  //Serial.begin(115200);
   //button initialization
   pinMode(BUTTON_PIN_1, INPUT_PULLUP);  // Taster 1 als Eingang mit Pull-up-Widerstand
   pinMode(BUTTON_PIN_2, INPUT_PULLUP);  // Taster 2 als Eingang mit Pull-up-Widerstand
@@ -194,7 +194,7 @@ void loop() {
         delay(30);
         if (!digitalRead(BUTTON_PIN_1)){
           Serial.println("I am in Button1: Confirm");
-          mqttClient.publish(pubPubVote, response);
+          mqttClient.publish(pubTopicVoteResponse, response);
           state = CLOSE_VOTE;
           while (!digitalRead(BUTTON_PIN_1)){
             delay(100);
