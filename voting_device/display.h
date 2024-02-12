@@ -13,6 +13,10 @@ extern Epd epd;
 //Display functions called in voting_device.ino
 void initDisplay();
 
+void paintThankyouScreen();
+
+void paintWelcomeScreen();
+
 void paintVoteScreen(const char *question, int batteryLevel);
 
 void paintConfirmScreen(const char *response, int batteryLevel);

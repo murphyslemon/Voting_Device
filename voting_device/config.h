@@ -25,8 +25,8 @@
 
 
 // WLAN-Settings
-const char* ssid = "franks_galaxy";
-const char* password = "veef2267";
+const char* ssid = "Rhod's wifi 2.4G";
+const char* password = "0413113368";
 
 // MQTT-Server Settings
 const char* mqtt_server = "194.110.231.227";

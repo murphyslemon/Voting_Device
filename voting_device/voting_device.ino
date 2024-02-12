@@ -80,14 +80,11 @@ void connectToMQTT() {
   }
   Serial.println("Connection to MQTT server established");
 }
-bool debounce(int pin) {
-  static uint16_t state = 0;
-  state = (state<<1) | digitalRead(pin) | 0xfe00;
-  return (state == 0xff00);
-}
+
+int batteryPercentage = checkBatteryLevel();
 
 void setup() {
-  //Serial.begin(115200);
+  Serial.begin(115200);
   //button initialization
   pinMode(BUTTON_PIN_1, INPUT_PULLUP);  // Taster 1 als Eingang mit Pull-up-Widerstand
   pinMode(BUTTON_PIN_2, INPUT_PULLUP);  // Taster 2 als Eingang mit Pull-up-Widerstand
@@ -95,19 +92,9 @@ void setup() {
   pinMode(RX_PIN, INPUT_PULLUP);
   digitalWrite(PWR_PIN, HIGH); //power on device
   
-  /*
-  //LED initialization
-  pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(5, OUTPUT);
-  digitalWrite(5, HIGH);
-  digitalWrite(LED_BUILTIN, HIGH);
-  pinMode(RXPIN, INPUT_PULLUP); //COMMMENT OUT THIS LINE IF YOU ARE USING SERIAL
-  */
-  
   //Display initialization
   initDisplay();
-
-  //attachISR();
+  startupScreen(batteryPercentage);
 
   WiFi.begin(ssid, password);
   connectToWiFi();
@@ -125,7 +112,8 @@ void setup() {
 }
 
   int state = 0;
-  int batteryPercentage = checkBatteryLevel(); //this may need to be global if we diplay screen in setup
+  //int batteryPercentage = checkBatteryLevel(); //this may need to be global if we diplay screen in setup
+  //int batteryPercentage = 20;
   char response[STRINGSIZE] = "";
   char votingID[STRINGSIZE] = "";
   char pubTopicVoteResponse[STRINGSIZE] = "";
@@ -150,7 +138,7 @@ void loop() {
         MQTT_flag = 0;
         strcpy(voteTitle, MQTTVotingTitle);
         Serial.println(voteTitle);
-        paintVoteScreen(voteTitle, batteryPercentage);
+        paintVoteScreen(voteTitle);
         strcat(pubTopicVoteResponse, pubPubVote);
         strcat(pubTopicVoteResponse, votingID);
         state = VOTE;
@@ -162,9 +150,9 @@ void loop() {
         delay(30);
         if (!digitalRead(BUTTON_PIN_1)){
           Serial.println("I am in Button1: Vote");
-          snprintf(responseBuffer, sizeof(responseBuffer), "{\"vote\":\"Yes\", \"votingTitle\":\"%s\"}", MQTTVotingTitle);
+          snprintf(responseBuffer, sizeof(responseBuffer), "{\"vote\":\"Yes\", \"VoteTitle\":\"%s\"}", MQTTVotingTitle);
           strcpy(response, responseBuffer);
-          paintConfirmScreen("YES", batteryPercentage);
+          paintConfirmScreen("YES");
           Serial.println("YES");
           state = CONFIRM;
           while (!digitalRead(BUTTON_PIN_1)){
@@ -175,10 +163,10 @@ void loop() {
       else if (!digitalRead(BUTTON_PIN_2)) {
         delay(30);
         if (!digitalRead(BUTTON_PIN_2)){
-          snprintf(responseBuffer, sizeof(responseBuffer), "{\"vote\":\"Abstain\", \"votingTitle\":\"%s\"}", MQTTVotingTitle);
+          snprintf(responseBuffer, sizeof(responseBuffer), "{\"vote\":\"Abstain\", \"VoteTitle\":\"%s\"}", MQTTVotingTitle);
           strcpy(response, responseBuffer);
-          paintConfirmScreen("ABSTAIN", batteryPercentage);
-          Serial.println("PASS");
+          paintConfirmScreen("ABSTAIN");
+          Serial.println("ABSTAIN");
           state = CONFIRM;
           while (!digitalRead(BUTTON_PIN_2)){
             delay(100);
@@ -188,9 +176,9 @@ void loop() {
       else if (!digitalRead(BUTTON_PIN_3)) {
         delay(30);
         if (!digitalRead(BUTTON_PIN_3)){
-          snprintf(responseBuffer, sizeof(responseBuffer), "{\"vote\":\"No\", \"votingTitle\":\"%s\"}", MQTTVotingTitle);
+          snprintf(responseBuffer, sizeof(responseBuffer), "{\"vote\":\"No\", \"VoteTitle\":\"%s\"}", MQTTVotingTitle);
           strcpy(response, responseBuffer);
-          paintConfirmScreen("NO", batteryPercentage);
+          paintConfirmScreen("NO");
           Serial.println("NO");
           state = CONFIRM;
           while (!digitalRead(BUTTON_PIN_3)){
@@ -216,7 +204,7 @@ void loop() {
       else if (!digitalRead(BUTTON_PIN_3)) {
         delay(30);
         if (!digitalRead(BUTTON_PIN_3)){
-          paintVoteScreen(voteTitle, batteryPercentage);
+          paintVoteScreen(voteTitle);
           state = VOTE;
           while (!digitalRead(BUTTON_PIN_3)){
             delay(100);

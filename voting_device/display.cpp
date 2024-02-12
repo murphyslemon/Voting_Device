@@ -12,7 +12,7 @@ void initDisplay(){
   paint.SetRotate(ROTATE_270); //rotate screen 
 }
 
-void paintVoteScreen(const char *question, int batteryLevel) { //battery level is a range between 0 and 25, ie. battery at 100% = 25, battery empty=0
+void startupScreen(int batteryLevel){
   //wifilogo
     paint.SetWidth(35);
     paint.SetHeight(35);
@@ -25,7 +25,36 @@ void paintVoteScreen(const char *question, int batteryLevel) { //battery level i
   //battery status bar
     paint.DrawFilledRectangle(4, 8, batteryLevel, 24, COLORED);
     epd.SetFrameMemory(paint.GetImage(), 0, (200-35-3), paint.GetWidth(), paint.GetHeight());
-  //Bottom buttton bar
+  //Welcome msg
+    char text[9] = "WELCOME!";
+    paint.SetWidth(30);
+    paint.SetHeight(200);
+    paint.Clear(UNCOLORED); // paints the height and width with the given color
+    paint.DrawStringAt((200-strlen(text)*17)/2, 0, text, &Font24, COLORED); //moves text to co-ordinates with-in the set height and width
+    paint.DrawStringAt((200-strlen(text)*17)/2+1, 0, text, &Font24, COLORED);
+    epd.SetFrameMemory(paint.GetImage(), 100, 0, paint.GetWidth(), paint.GetHeight()); //moves page to co-ordinates
+    epd.DisplayFrame();
+}
+
+static void clearQuestionArea(){
+  int offset = 36;
+  for (int i = 0; i < 3; i++){
+    paint.SetWidth(40);
+    paint.SetHeight(200);
+    paint.Clear(UNCOLORED);
+    epd.SetFrameMemory(paint.GetImage(), offset, 0, paint.GetWidth(), paint.GetHeight());
+    offset += 40;
+  }  
+  paint.SetWidth(23);
+  paint.SetHeight(200);
+  paint.Clear(UNCOLORED);
+  epd.SetFrameMemory(paint.GetImage(), offset, 0, paint.GetWidth(), paint.GetHeight());
+}
+
+void paintVoteScreen(const char *question) { //battery level is a range between 0 and 25, ie. battery at 100% = 25, battery empty=0
+  //clear screen
+    clearQuestionArea();
+    //Bottom buttton bar
     paint.SetWidth(22);
     paint.SetHeight(200);
     paint.Clear(UNCOLORED); //paints the height and width the given colour
@@ -50,19 +79,9 @@ void paintVoteScreen(const char *question, int batteryLevel) { //battery level i
     epd.DisplayFrame();
 }
 
-void paintConfirmScreen(const char *response, int batteryLevel) {
-  //wifilogo
-    paint.SetWidth(35);
-    paint.SetHeight(35);
-    paint.Clear(UNCOLORED); // paints the height and width with the given color
-    drawImage(0, 0, 35, 35, wifilogo); // draw the image at (0, 0) coordinates
-    epd.SetFrameMemory(paint.GetImage(), 0, 0, paint.GetWidth(), paint.GetHeight());
-  //battery logo
-    paint.Clear(UNCOLORED);
-    drawImage(0, 0, 35, 35, batterylogo); // draw the image at (0, 0) coordinates
-  //battery status bar
-    paint.DrawFilledRectangle(4, 8, batteryLevel, 24, COLORED);
-    epd.SetFrameMemory(paint.GetImage(), 0, (200-35-3), paint.GetWidth(), paint.GetHeight());
+void paintConfirmScreen(const char *response) {
+  //clear screen
+    clearQuestionArea();
   //Bottom button bar
     paint.SetWidth(22);
     paint.SetHeight(200);
@@ -79,8 +98,8 @@ void paintConfirmScreen(const char *response, int batteryLevel) {
     paint.DrawStringAt(20, 0, "You voted:", &Font20, COLORED); //moves text to co-ordinates with-in the set height and width
     epd.SetFrameMemory(paint.GetImage(), 40, 0, paint.GetWidth(), paint.GetHeight());
     paint.Clear(UNCOLORED); //paints the height and width the given colour
-    paint.DrawStringAt(70, 0, response, &Font24, COLORED); //moves text to co-ordinates with-in the set height and width
-    paint.DrawStringAt(71, 0, response, &Font24, COLORED); //moves text to co-ordinates with-in the set height and width
+    paint.DrawStringAt((200-strlen(response)*17)/2, 0, response, &Font24, COLORED); //moves text to co-ordinates with-in the set height and width
+    paint.DrawStringAt((200-strlen(response)*17)/2+1, 0, response, &Font24, COLORED); //moves text to co-ordinates with-in the set height and width
     epd.SetFrameMemory(paint.GetImage(), 80, 0, paint.GetWidth(), paint.GetHeight());
     paint.Clear(UNCOLORED); //paints the height and width the given colour
     paint.DrawStringAt(10, 0, "Are you sure?", &Font20, COLORED); //moves text to co-ordinates with-in the set height and width
@@ -90,24 +109,21 @@ void paintConfirmScreen(const char *response, int batteryLevel) {
 }
 
 void paintClosingScreen() {
+    //clear screen
+    clearQuestionArea();
+    //clear bottom bar
+    paint.SetWidth(40);
+    paint.SetHeight(200);
+    paint.Clear(UNCOLORED);
+    epd.SetFrameMemory(paint.GetImage(), (200-40), 0, paint.GetWidth(), paint.GetHeight());
+    //Thank you msg
+    char text[11] = "THANK YOU!";
     paint.SetWidth(30);
     paint.SetHeight(200);
     paint.Clear(UNCOLORED); // paints the height and width with the given color
-    epd.SetFrameMemory(paint.GetImage(), 0, 0, paint.GetWidth(), paint.GetHeight());
-    paint.Clear(UNCOLORED); // paints the height and width with the given color
-    epd.SetFrameMemory(paint.GetImage(), 30, 0, paint.GetWidth(), paint.GetHeight());
-    paint.Clear(UNCOLORED); // paints the height and width with the given color
-    epd.SetFrameMemory(paint.GetImage(), 60, 0, paint.GetWidth(), paint.GetHeight());
-    paint.Clear(UNCOLORED); // paints the height and width with the given color
-    paint.DrawStringAt(12, 0, "THANK YOU!!", &Font24, COLORED); //moves text to co-ordinates with-in the set height and width
-    paint.DrawStringAt(13, 0, "THANK YOU!!", &Font24, COLORED);
-    epd.SetFrameMemory(paint.GetImage(), 90, 0, paint.GetWidth(), paint.GetHeight());
-    paint.Clear(UNCOLORED); // paints the height and width with the given color
-    epd.SetFrameMemory(paint.GetImage(), 120, 0, paint.GetWidth(), paint.GetHeight());
-    paint.Clear(UNCOLORED); // paints the height and width with the given color
-    epd.SetFrameMemory(paint.GetImage(), 150, 0, paint.GetWidth(), paint.GetHeight());
-    paint.Clear(UNCOLORED); // paints the height and width with the given color
-    epd.SetFrameMemory(paint.GetImage(), 180, 0, paint.GetWidth(), paint.GetHeight());
+    paint.DrawStringAt((200-strlen(text)*17)/2, 0, text, &Font24, COLORED); //moves text to co-ordinates with-in the set height and width
+    paint.DrawStringAt((200-strlen(text)*17)/2+1, 0, text, &Font24, COLORED);
+    epd.SetFrameMemory(paint.GetImage(), 100, 0, paint.GetWidth(), paint.GetHeight()); //moves page to co-ordinates
     epd.DisplayFrame();
 }
 
