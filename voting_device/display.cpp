@@ -2,7 +2,7 @@
 #include "images.h"
 
 Epd epd;
-unsigned char image[1024];
+unsigned char image[5*1024];
 Paint paint(image, 0, 0);
 
 void initDisplay(){
@@ -109,21 +109,11 @@ void paintConfirmScreen(const char *response) {
 }
 
 void paintClosingScreen() {
-    //clear screen
-    clearQuestionArea();
-    //clear bottom bar
-    paint.SetWidth(40);
+    paint.SetWidth(200);
     paint.SetHeight(200);
     paint.Clear(UNCOLORED);
-    epd.SetFrameMemory(paint.GetImage(), (200-40), 0, paint.GetWidth(), paint.GetHeight());
-    //Thank you msg
-    char text[11] = "THANK YOU!";
-    paint.SetWidth(30);
-    paint.SetHeight(200);
-    paint.Clear(UNCOLORED); // paints the height and width with the given color
-    paint.DrawStringAt((200-strlen(text)*17)/2, 0, text, &Font24, COLORED); //moves text to co-ordinates with-in the set height and width
-    paint.DrawStringAt((200-strlen(text)*17)/2+1, 0, text, &Font24, COLORED);
-    epd.SetFrameMemory(paint.GetImage(), 100, 0, paint.GetWidth(), paint.GetHeight()); //moves page to co-ordinates
+    drawImage(0,0,200,200,thankyoulogo);
+    epd.SetFrameMemory(paint.GetImage(), 0, 0, paint.GetWidth(), paint.GetHeight()); //moves page to co-ordinates
     epd.DisplayFrame();
 }
 

@@ -15,11 +15,11 @@ void initDisplay();
 
 void paintThankyouScreen();
 
-void paintWelcomeScreen();
+void startupScreen(int batteryPercentage);
 
-void paintVoteScreen(const char *question, int batteryLevel);
+void paintVoteScreen(const char *question);
 
-void paintConfirmScreen(const char *response, int batteryLevel);
+void paintConfirmScreen(const char *response);
 
 void paintClosingScreen();
 

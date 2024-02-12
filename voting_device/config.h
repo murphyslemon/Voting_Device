@@ -25,11 +25,11 @@
 
 
 // WLAN-Settings
-const char* ssid = "Rhod's wifi 2.4G";
-const char* password = "0413113368";
+const char* ssid = "ISDProjectLAN";
+const char* password = "557949122";
 
 // MQTT-Server Settings
-const char* mqtt_server = "194.110.231.227";
+const char* mqtt_server = "10.42.0.1";
 const int mqtt_port = 1883;
 const char* mqtt_user = "";
 const char* mqtt_password = "";
