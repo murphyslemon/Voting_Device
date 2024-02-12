@@ -1,67 +1,33 @@
 #include "config.h"
-#include "power.h"
-#include "display.h"
-#include "button_interrupts.h"
-#include <ArduinoJson.h>
 
 //#################################################################################################
 //### REMEMBER TO COMMENT OUT: Serial.begin(115200); FROM SETUP FUNCTION, AS IT AFFECTS RX PIN. ###
 //#################################################################################################
 
-// MQTT-Client erstellen
-WiFiClient wifiClient;
-PubSubClient mqttClient(wifiClient);
-const size_t JSON_CAPACITY = 256;
-char MQTTmsg[STRINGSIZE] = "";
-bool MQTT_flag = 0;
-char MQTTVotingId [STRINGSIZE]= "";
-char MQTTVotingTitle [STRINGSIZE]= "";
+// WLAN-Settings
+  const char* ssid = "ISDProjectLAN";
+  const char* password = "557949122";
 
-// MQTT Callback Function
-void callback(char* topic, byte* payload, unsigned int length) {
-  // Copy payload bytes to MQTTmsg
-  memcpy(MQTTmsg, payload, length);
-  MQTTmsg[length] = '\0'; // Ensure null-termination for string
+//Mqtt topics to publish
+  const String pubInit = "/registration/Server/"+ String(WiFi.macAddress());
+  const char* pubPubVote = "/vote/";
 
-  // Parse JSON
-  StaticJsonDocument<JSON_CAPACITY> doc;
-  DeserializationError error = deserializeJson(doc, MQTTmsg);
-  
-  // If parsing succeeds, extract the necessary fields
-  if (!error) {
-    if (doc.containsKey("VotingID")) {
-      const char* votingID = doc["VotingID"];
-      Serial.print("Received Voting ID: ");
-      Serial.println(votingID);
-      memcpy(MQTTVotingId, votingID, strlen(votingID) + 1);
-      // Optionally, you can set a flag to indicate that a new ID has been received
-      MQTT_flag = true;
-    }
-    
-    if (doc.containsKey("VoteTitle")) {
-      const char* voteTitle = doc["VoteTitle"];
-      Serial.print("Received Vote Title: ");
-      Serial.println(voteTitle);
-      memcpy(MQTTVotingTitle, voteTitle, strlen(voteTitle) + 1);
-      // Optionally, you can set a flag to indicate that a new title has been received
-      MQTT_flag = true;
-    }
-    
-    // Add more conditions to extract other fields as needed
-  } else {
-    Serial.print("Failed to parse JSON: ");
-    Serial.println(error.c_str());
-  }
-}
+// MQTT topics to subscribe
+  const String subInit = "/registration/esp/"+ String(WiFi.macAddress()); // /registration/esp/
+  const char* subVoteSetup = "/setupVote/Setup";
+  const char* subResync = "/setupVote/Resync";
 
-//move this function to another folder
-int checkBatteryLevel(){
-  int adcValue = analogRead(BATTERY_PIN);
-  if (adcValue > 440) {
-    return FULL_BATTERY;
-  }
-  return EMPTY_BATTERY;
-}
+//battery level
+  int batteryPercentage = checkBatteryLevel();
+
+//program variables
+  int state = 0;
+  char response[STRINGSIZE] = "";
+  char votingID[STRINGSIZE] = "";
+  char pubTopicVoteResponse[STRINGSIZE] = "";
+  char voteTitle[STRINGSIZE] = "";
+  char responseBuffer[STRINGSIZE+50];
+
 void connectToWiFi() {
   Serial.print("Connecting to WiFi");
   while (WiFi.status() != WL_CONNECTED) {
@@ -72,36 +38,29 @@ void connectToWiFi() {
   Serial.print("Connected, IP address: ");
   Serial.println(WiFi.localIP());
 }
-void connectToMQTT() {
-  while (!mqttClient.connected()) {
-    Serial.println("Connecting to the MQTT server");
-    mqttClient.connect(WiFi.macAddress().c_str(), mqtt_user, mqtt_password);
-    delay(500);
-  }
-  Serial.println("Connection to MQTT server established");
-}
-
-int batteryPercentage = checkBatteryLevel();
 
 void setup() {
   //Serial.begin(115200);
-  //button initialization
+
+//button initialization
   pinMode(BUTTON_PIN_1, INPUT_PULLUP);  // Taster 1 als Eingang mit Pull-up-Widerstand
   pinMode(BUTTON_PIN_2, INPUT_PULLUP);  // Taster 2 als Eingang mit Pull-up-Widerstand
   pinMode(PWR_PIN, OUTPUT);
   pinMode(RX_PIN, INPUT_PULLUP);
   digitalWrite(PWR_PIN, HIGH); //power on device
   
-  //Display initialization
+//Display initialization
   initDisplay();
   startupScreen(batteryPercentage);
 
+//wifi initialization
   WiFi.begin(ssid, password);
   connectToWiFi();
+
+//mqtt initialization
   mqttClient.setServer(mqtt_server, mqtt_port);
   mqttClient.setCallback(callback);
   connectToMQTT();
-
   String macAddress = "{\"Mac\" : \"" + String(WiFi.macAddress()) + "\"}";
   Serial.println(macAddress);
   mqttClient.publish(pubInit.c_str(), macAddress.c_str());  //send mac address
@@ -110,15 +69,6 @@ void setup() {
   //mqttClient.subscribe(subResync, MQTTsubQos);
   mqttClient.subscribe(subVoteSetup, MQTTsubQos); //recieve question
 }
-
-  int state = 0;
-  //int batteryPercentage = checkBatteryLevel(); //this may need to be global if we diplay screen in setup
-  //int batteryPercentage = 20;
-  char response[STRINGSIZE] = "";
-  char votingID[STRINGSIZE] = "";
-  char pubTopicVoteResponse[STRINGSIZE] = "";
-  char voteTitle[STRINGSIZE] = "";
-  char responseBuffer[STRINGSIZE];
   
 void loop() {
   powerOff();

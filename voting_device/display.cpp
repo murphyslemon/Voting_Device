@@ -112,8 +112,9 @@ void paintClosingScreen() {
     paint.SetWidth(200);
     paint.SetHeight(200);
     paint.Clear(UNCOLORED);
-    drawImage(0,0,200,200,thankyoulogo);
     epd.SetFrameMemory(paint.GetImage(), 0, 0, paint.GetWidth(), paint.GetHeight()); //moves page to co-ordinates
+    drawImage(0,0,200,180,thankyoulogo);
+    epd.SetFrameMemory(paint.GetImage(), 10, 0, paint.GetWidth(), paint.GetHeight()); //moves page to co-ordinates
     epd.DisplayFrame();
 }
 
