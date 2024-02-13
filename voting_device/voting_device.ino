@@ -63,8 +63,8 @@ void setup() {
   connectToMQTT();
   String macAddress = "{\"Mac\" : \"" + String(WiFi.macAddress()) + "\"}";
   Serial.println(macAddress);
-  mqttClient.publish(pubInit.c_str(), macAddress.c_str());  //send mac address
   mqttClient.subscribe(subInit.c_str(), MQTTsubQos); //recieve voting ID
+  mqttClient.publish(pubInit.c_str(), macAddress.c_str());  //send mac address
   Serial.println("#" + String(subInit.c_str()) + "#") ;
   //mqttClient.subscribe(subResync, MQTTsubQos);
   mqttClient.subscribe(subVoteSetup, MQTTsubQos); //recieve question
@@ -91,6 +91,7 @@ void loop() {
         paintVoteScreen(voteTitle);
         strcat(pubTopicVoteResponse, pubPubVote);
         strcat(pubTopicVoteResponse, votingID);
+        Serial.println(pubTopicVoteResponse);
         state = VOTE;
       }
       break;

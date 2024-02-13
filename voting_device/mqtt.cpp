@@ -20,7 +20,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   // Copy payload bytes to MQTTmsg
   memcpy(MQTTmsg, payload, length);
   MQTTmsg[length] = '\0'; // Ensure null-termination for string
-
+  Serial.println(MQTTmsg);
   // Parse JSON
   StaticJsonDocument<JSON_CAPACITY> doc;
   DeserializationError error = deserializeJson(doc, MQTTmsg);
